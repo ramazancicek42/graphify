@@ -7,8 +7,15 @@ __pycache__/
 .venv/
 venv/
 node_modules/
+.mypy_cache/
+.pytest_cache/
 
-# Logs and temp files
+# Build artifacts
+dist/
+build/
+target/
+
+# Logs and temporary files
 *.log
 *.tmp
 *.swp
@@ -22,17 +29,12 @@ node_modules/
 .vscode/
 .idea/
 
-# Build artifacts
-dist/
-build/
-target/
-
 # Coverage reports
-.coverage
 coverage/
 htmlcov/
+.coverage
 
-# Python cache
-.mypy_cache/
-.pytest_cache/
+# OS specific
+.DS_Store
+Thumbs.db
 ```

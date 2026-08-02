@@ -13,6 +13,12 @@ Available connectors:
 - Microservice Tracer
 - Cross-Layer Parser
 - Unified Graph Builder
+- Android Connectors (UI Mapper, Data Flow, DI Resolver, Manifest Analyzer)
+- Termux Optimizer
+- Build Error Analyzer
+- Test Coverage Analyzer
+- ProGuard/R8 Mapper
+- Resource Conflict Detector
 """
 
 from .cross_layer_parser import (
@@ -76,6 +82,12 @@ from .di_resolver import DIGraphResolver
 from .manifest_analyzer import ManifestAnalyzer
 from .termux_optimizer import TermuxOptimizer, enable_termux_mode
 
+# Build & Test Analysis
+from .build_error_analyzer import GradleBuildErrorAnalyzer, BuildError, ErrorType
+from .test_coverage_analyzer import TestCoverageAnalyzer, MockDataGenerator, CoverageGap, CoverageGapType, MockDataStructure
+from .proguard_mapper import ProGuardMapParser, ObfuscationGraphIntegrator, MappingEntry, CrashFrame
+from .resource_detector import ResourceConflictDetector, ResourceConflict, ResourceUsage
+
 __all__ = [
     # Cross-Layer Parser
     'CrossLayerParser',
@@ -129,6 +141,23 @@ __all__ = [
     'ManifestAnalyzer',
     'TermuxOptimizer',
     'enable_termux_mode',
+    
+    # Build & Test Analysis
+    'GradleBuildErrorAnalyzer',
+    'BuildError',
+    'ErrorType',
+    'TestCoverageAnalyzer',
+    'MockDataGenerator',
+    'CoverageGap',
+    'CoverageGapType',
+    'MockDataStructure',
+    'ProGuardMapParser',
+    'ObfuscationGraphIntegrator',
+    'MappingEntry',
+    'CrashFrame',
+    'ResourceConflictDetector',
+    'ResourceConflict',
+    'ResourceUsage',
 ]
 
 
