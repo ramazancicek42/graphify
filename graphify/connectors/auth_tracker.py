@@ -15,6 +15,8 @@ import os
 from typing import Dict, List, Set, Tuple, Optional, Any
 from dataclasses import dataclass, field
 import networkx as nx
+import logging
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -32,14 +34,14 @@ class AuthNode:
 
 class AuthFlowTracker:
     """Tracks authentication and authorization flows in code."""
-    
+
     def __init__(self):
         self.nodes: Dict[str, AuthNode] = {}
         self.edges: List[Tuple[str, str, Dict[str, Any]]] = []
-        
+
     def parse_jwt_usage(self, code_dir: str, languages: List[str] = ['python', 'javascript', 'typescript', 'java', 'go']) -> None:
         """Scan code for JWT token generation and validation."""
-        
+
         jwt_patterns = {
             'python': {
                 'encode': [
@@ -99,31 +101,31 @@ class AuthFlowTracker:
                 ]
             }
         }
-        
+
         for root, dirs, files in os.walk(code_dir):
             dirs[:] = [d for d in dirs if d not in {'node_modules', 'vendor', '.git', '__pycache__', 'build', 'dist'}]
-            
+
             for file in files:
                 file_path = os.path.join(root, file)
                 ext = os.path.splitext(file)[1].lower()
-                
+
                 lang_map = {'.py': 'python', '.js': 'javascript', '.ts': 'typescript', '.java': 'java', '.go': 'go'}
                 lang = lang_map.get(ext)
-                
+
                 if lang not in languages:
                     continue
-                    
+
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        
+
                     # Find JWT encode points (token issuers)
                     for pattern in jwt_patterns.get(lang, {}).get('encode', []):
                         for match in re.finditer(pattern, content):
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             node_name = f"jwt_issuer_{os.path.basename(file_path)}_{match.start()}"
-                            
+
                             self.nodes[node_name] = AuthNode(
                                 name=node_name,
                                 kind='JWT_ISSUER',
@@ -131,14 +133,14 @@ class AuthFlowTracker:
                                 file_path=file_path,
                                 line_number=line_num
                             )
-                            
+
                     # Find JWT decode points (token validators)
                     for pattern in jwt_patterns.get(lang, {}).get('decode', []):
                         for match in re.finditer(pattern, content):
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             node_name = f"jwt_validator_{os.path.basename(file_path)}_{match.start()}"
-                            
+
                             self.nodes[node_name] = AuthNode(
                                 name=node_name,
                                 kind='JWT_VALIDATOR',
@@ -146,17 +148,17 @@ class AuthFlowTracker:
                                 file_path=file_path,
                                 line_number=line_num
                             )
-                            
+
                     # Extract claims/roles from JWT
                     for pattern in jwt_patterns.get(lang, {}).get('claims', []):
                         for match in re.finditer(pattern, content):
                             if match.lastindex:
                                 claim_value = match.group(1)
-                                
+
                                 # Check if this is a role claim
                                 if 'role' in match.group(0).lower():
                                     roles = [r.strip().strip('"\'') for r in claim_value.split(',')]
-                                    
+
                                     role_node = f"jwt_roles_{match.start()}"
                                     self.nodes[role_node] = AuthNode(
                                         name=role_node,
@@ -166,13 +168,12 @@ class AuthFlowTracker:
                                         line_number=content[:match.start()].count('\n') + 1,
                                         roles=roles
                                     )
-                                    
-                except Exception:
-                    pass
-                    
+
+                except Exception as e:
+                    logger.debug("skipping entry: %s", e)
     def parse_oauth2_flows(self, code_dir: str, languages: List[str] = ['python', 'javascript', 'typescript', 'java', 'go']) -> None:
         """Scan code for OAuth2 endpoints and flows."""
-        
+
         oauth_patterns = {
             'python': {
                 'auth_endpoint': [
@@ -203,32 +204,32 @@ class AuthFlowTracker:
                 ]
             }
         }
-        
+
         for root, dirs, files in os.walk(code_dir):
             dirs[:] = [d for d in dirs if d not in {'node_modules', 'vendor', '.git', '__pycache__', 'build', 'dist'}]
-            
+
             for file in files:
                 file_path = os.path.join(root, file)
                 ext = os.path.splitext(file)[1].lower()
-                
+
                 lang_map = {'.py': 'python', '.js': 'javascript', '.ts': 'typescript'}
                 lang = lang_map.get(ext)
-                
+
                 if lang not in languages:
                     continue
-                    
+
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        
+
                     # Find OAuth2 authorization endpoints
                     for pattern in oauth_patterns.get(lang, {}).get('auth_endpoint', []):
                         for match in re.finditer(pattern, content):
                             endpoint = match.group(1) if match.lastindex else '/oauth'
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             node_name = f"oauth_endpoint_{os.path.basename(file_path)}_{match.start()}"
-                            
+
                             # Determine flow type
                             flow_type = 'unknown'
                             if 'authorize' in endpoint.lower():
@@ -237,7 +238,7 @@ class AuthFlowTracker:
                                 flow_type = 'token_exchange'
                             elif 'callback' in endpoint.lower() or 'callback' in endpoint.lower():
                                 flow_type = 'callback'
-                                
+
                             self.nodes[node_name] = AuthNode(
                                 name=node_name,
                                 kind='OAUTH_ENDPOINT',
@@ -247,15 +248,15 @@ class AuthFlowTracker:
                                 endpoint=endpoint,
                                 scopes=[flow_type]
                             )
-                            
+
                     # Find OAuth provider configurations
                     for pattern in oauth_patterns.get(lang, {}).get('provider', []):
                         for match in re.finditer(pattern, content):
                             provider_name = match.group(1) if match.lastindex else 'unknown'
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             provider_node = f"oauth_provider_{provider_name}_{match.start()}"
-                            
+
                             self.nodes[provider_node] = AuthNode(
                                 name=provider_node,
                                 kind='OAUTH_PROVIDER',
@@ -263,13 +264,12 @@ class AuthFlowTracker:
                                 file_path=file_path,
                                 line_number=line_num
                             )
-                            
-                except Exception:
-                    pass
-                    
+
+                except Exception as e:
+                    logger.debug("skipping entry: %s", e)
     def parse_session_management(self, code_dir: str, languages: List[str] = ['python', 'javascript', 'typescript', 'java', 'php']) -> None:
         """Scan code for session handling."""
-        
+
         session_patterns = {
             'python': {
                 'session': [
@@ -296,30 +296,30 @@ class AuthFlowTracker:
                 ]
             }
         }
-        
+
         for root, dirs, files in os.walk(code_dir):
             dirs[:] = [d for d in dirs if d not in {'node_modules', 'vendor', '.git', '__pycache__', 'build', 'dist'}]
-            
+
             for file in files:
                 file_path = os.path.join(root, file)
                 ext = os.path.splitext(file)[1].lower()
-                
+
                 lang_map = {'.py': 'python', '.js': 'javascript', '.php': 'php'}
                 lang = lang_map.get(ext)
-                
+
                 if lang not in languages:
                     continue
-                    
+
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        
+
                     for pattern in session_patterns.get(lang, {}).get('session', []):
                         for match in re.finditer(pattern, content):
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             node_name = f"session_handler_{os.path.basename(file_path)}_{match.start()}"
-                            
+
                             self.nodes[node_name] = AuthNode(
                                 name=node_name,
                                 kind='SESSION_HANDLER',
@@ -327,13 +327,12 @@ class AuthFlowTracker:
                                 file_path=file_path,
                                 line_number=line_num
                             )
-                            
-                except Exception:
-                    pass
-                    
+
+                except Exception as e:
+                    logger.debug("skipping entry: %s", e)
     def parse_permission_checks(self, code_dir: str, languages: List[str] = ['python', 'javascript', 'typescript', 'java', 'csharp']) -> None:
         """Scan code for permission and role checks."""
-        
+
         permission_patterns = {
             'python': {
                 'check': [
@@ -370,31 +369,31 @@ class AuthFlowTracker:
                 ]
             }
         }
-        
+
         for root, dirs, files in os.walk(code_dir):
             dirs[:] = [d for d in dirs if d not in {'node_modules', 'vendor', '.git', '__pycache__', 'build', 'dist'}]
-            
+
             for file in files:
                 file_path = os.path.join(root, file)
                 ext = os.path.splitext(file)[1].lower()
-                
+
                 lang_map = {'.py': 'python', '.js': 'javascript', '.ts': 'typescript', '.java': 'java', '.cs': 'csharp'}
                 lang = lang_map.get(ext)
-                
+
                 if lang not in languages:
                     continue
-                    
+
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        
+
                     for pattern in permission_patterns.get(lang, {}).get('check', []):
                         for match in re.finditer(pattern, content):
                             role_or_perm = match.group(1) if match.lastindex else 'authenticated'
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             node_name = f"auth_check_{os.path.basename(file_path)}_{match.start()}"
-                            
+
                             self.nodes[node_name] = AuthNode(
                                 name=node_name,
                                 kind='PERMISSION_CHECK',
@@ -403,13 +402,12 @@ class AuthFlowTracker:
                                 line_number=line_num,
                                 roles=[role_or_perm]
                             )
-                            
-                except Exception:
-                    pass
-                    
+
+                except Exception as e:
+                    logger.debug("skipping entry: %s", e)
     def parse_api_keys(self, code_dir: str) -> None:
         """Scan code for API key usage."""
-        
+
         api_key_patterns = [
             r'X-API-Key',
             r'api_key\s*=\s*request\.headers',
@@ -417,27 +415,27 @@ class AuthFlowTracker:
             r'verify_api_key\s*\(',
             r'APIKeyHeader\s*\(',
         ]
-        
+
         for root, dirs, files in os.walk(code_dir):
             dirs[:] = [d for d in dirs if d not in {'node_modules', 'vendor', '.git', '__pycache__'}]
-            
+
             for file in files:
                 file_path = os.path.join(root, file)
                 ext = os.path.splitext(file)[1].lower()
-                
+
                 if ext not in ['.py', '.js', '.ts', '.java', '.go']:
                     continue
-                    
+
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        
+
                     for pattern in api_key_patterns:
                         for match in re.finditer(pattern, content, re.IGNORECASE):
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             node_name = f"api_key_{os.path.basename(file_path)}_{match.start()}"
-                            
+
                             self.nodes[node_name] = AuthNode(
                                 name=node_name,
                                 kind='API_KEY',
@@ -445,14 +443,13 @@ class AuthFlowTracker:
                                 file_path=file_path,
                                 line_number=line_num
                             )
-                            
-                except Exception:
-                    pass
-                    
+
+                except Exception as e:
+                    logger.debug("skipping entry: %s", e)
     def build_graph(self) -> nx.DiGraph:
         """Build NetworkX graph from parsed auth flows."""
         G = nx.DiGraph()
-        
+
         # Add nodes
         for name, node in self.nodes.items():
             G.add_node(
@@ -466,18 +463,18 @@ class AuthFlowTracker:
                 roles=node.roles,
                 node_type='auth_flow'
             )
-            
+
         # Add edges between related auth components
         self._add_auth_flow_edges(G)
-        
+
         return G
-        
+
     def _add_auth_flow_edges(self, G: nx.DiGraph) -> None:
         """Add edges connecting auth components into logical flows."""
         # Connect JWT issuers to validators in same file
         issuers = [(n, node) for n, node in self.nodes.items() if node.kind == 'JWT_ISSUER']
         validators = [(n, node) for n, node in self.nodes.items() if node.kind == 'JWT_VALIDATOR']
-        
+
         for issuer_name, issuer_node in issuers:
             for validator_name, validator_node in validators:
                 if issuer_node.file_path == validator_node.file_path:
@@ -487,10 +484,10 @@ class AuthFlowTracker:
                         edge_type='jwt_flow',
                         file=issuer_node.file_path
                     )
-                    
+
         # Connect permission checks to their protected resources
         permission_nodes = [(n, node) for n, node in self.nodes.items() if node.kind == 'PERMISSION_CHECK']
-        
+
         for perm_name, perm_node in permission_nodes:
             # This would ideally link to the actual route/handler being protected
             # For now, we mark it as a standalone check
@@ -500,12 +497,12 @@ class AuthFlowTracker:
 def parse_auth_flows(directory: str) -> nx.DiGraph:
     """Main entry point for authentication flow parsing."""
     tracker = AuthFlowTracker()
-    
+
     # Parse different auth mechanisms
     tracker.parse_jwt_usage(directory)
     tracker.parse_oauth2_flows(directory)
     tracker.parse_session_management(directory)
     tracker.parse_permission_checks(directory)
     tracker.parse_api_keys(directory)
-    
+
     return tracker.build_graph()

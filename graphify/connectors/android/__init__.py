@@ -18,7 +18,7 @@ __all__ = [
     'ConfigValidator',
     'ConfigIssue',
     'diagnose_error_log',
-    
+
     # Auto-fix
     'AutoPatcher',
     'PatchProposal',

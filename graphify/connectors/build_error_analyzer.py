@@ -28,12 +28,12 @@ class BuildError:
 
 class GradleBuildErrorAnalyzer:
     """Analyzes Gradle build logs and connects errors to source code."""
-    
+
     def __init__(self):
         self.errors: List[BuildError] = []
         self.patterns = {
             ErrorType.DUPLICATE_CLASS: re.compile(
-                r"Duplicate class\s+([^\s]+)\s+found.*?ModuleA.*?ModuleB", 
+                r"Duplicate class\s+([^\s]+)\s+found.*?ModuleA.*?ModuleB",
                 re.IGNORECASE | re.DOTALL
             ),
             ErrorType.MIN_SDK_CONFLICT: re.compile(
@@ -61,12 +61,12 @@ class GradleBuildErrorAnalyzer:
                 re.IGNORECASE
             )
         }
-        
+
     def analyze_log(self, log_content: str) -> List[BuildError]:
         """Parse build log and extract errors."""
         self.errors = []
         lines = log_content.split('\n')
-        
+
         for i, line in enumerate(lines):
             # Check specific patterns
             for error_type, pattern in self.patterns.items():
@@ -75,7 +75,7 @@ class GradleBuildErrorAnalyzer:
                     error = self._create_error(error_type, match, lines, i)
                     if error:
                         self.errors.append(error)
-            
+
             # Generic error fallback
             if 'error:' in line.lower() and not any(p.search(line) for p in self.patterns.values()):
                 generic_match = re.search(r"error:\s*(.+)", line, re.IGNORECASE)
@@ -88,9 +88,9 @@ class GradleBuildErrorAnalyzer:
                         suggestion="Check syntax and imports.",
                         related_nodes=[]
                     ))
-        
+
         return self.errors
-    
+
     def _create_error(self, error_type: ErrorType, match, lines: List[str], line_idx: int) -> Optional[BuildError]:
         """Create structured error from regex match."""
         suggestions = {
@@ -102,10 +102,10 @@ class GradleBuildErrorAnalyzer:
             ErrorType.KAPT_ERROR: "Check annotation processor configuration.",
             ErrorType.PROGUARD_ERROR: "Add ProGuard keep rule for the class."
         }
-        
+
         file_path = self._extract_file_path(lines, line_idx)
         line_num = self._extract_line_number(lines, line_idx)
-        
+
         return BuildError(
             type=error_type,
             message=match.group(0).strip()[:200],
@@ -114,7 +114,7 @@ class GradleBuildErrorAnalyzer:
             suggestion=suggestions.get(error_type, "Review error message."),
             related_nodes=[file_path] if file_path else []
         )
-    
+
     def _extract_file_path(self, lines: List[str], idx: int) -> Optional[str]:
         """Extract file path from nearby lines."""
         search_range = max(0, idx - 5), min(len(lines), idx + 5)
@@ -123,7 +123,7 @@ class GradleBuildErrorAnalyzer:
             if match:
                 return match.group(1)
         return None
-    
+
     def _extract_line_number(self, lines: List[str], idx: int) -> Optional[int]:
         """Extract line number from error message."""
         for i in range(max(0, idx - 3), min(len(lines), idx + 3)):
@@ -131,17 +131,17 @@ class GradleBuildErrorAnalyzer:
             if match:
                 return int(match.group(1))
         return None
-    
+
     def get_summary(self) -> str:
         """Generate human-readable summary."""
         if not self.errors:
             return "No build errors detected."
-        
+
         summary = [f"Found {len(self.errors)} build error(s):\n"]
         for i, err in enumerate(self.errors, 1):
             summary.append(f"{i}. [{err.type.value}] {err.message}")
             if err.file_path:
                 summary.append(f"   File: {err.file_path}:{err.line_number or '?'}")
             summary.append(f"   Fix: {err.suggestion}\n")
-        
+
         return "\n".join(summary)

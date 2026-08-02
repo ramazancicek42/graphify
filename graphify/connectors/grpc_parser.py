@@ -14,6 +14,8 @@ import os
 from typing import Dict, List, Set, Tuple, Optional, Any
 from dataclasses import dataclass, field
 import networkx as nx
+import logging
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -32,20 +34,20 @@ class gRPCNode:
 
 class gRPCParser:
     """Parses .proto files and gRPC service implementations."""
-    
+
     def __init__(self):
         self.nodes: Dict[str, gRPCNode] = {}
         self.edges: List[Tuple[str, str, Dict[str, Any]]] = []
         self.implementation_map: Dict[str, str] = {}  # service_method -> code_location
-        
+
     def parse_file(self, file_path: str) -> None:
         """Parse a single .proto file."""
         if not os.path.exists(file_path):
             return
-            
+
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
-            
+
         lines = content.split('\n')
         current_package: Optional[str] = None
         current_node: Optional[gRPCNode] = None
@@ -53,31 +55,31 @@ class gRPCParser:
         in_message = False
         in_service = False
         in_enum = False
-        
+
         for line_num, line in enumerate(lines, 1):
             stripped = line.strip()
-            
+
             # Skip comments and empty lines
             if stripped.startswith('//') or not stripped:
                 continue
-                
+
             # Detect syntax and package
             syntax_match = re.match(r'^syntax\s*=\s*["\']proto3["\'];', stripped)
             if syntax_match:
                 continue
-                
+
             package_match = re.match(r'^package\s+([A-Za-z_][A-Za-z0-9_.]*);', stripped)
             if package_match:
                 current_package = package_match.group(1)
                 continue
-                
+
             # Detect imports
             import_match = re.match(r'^import\s+(?:public\s+|weak\s+)?["\']([^"\']+)["\'];', stripped)
             if import_match:
                 import_path = import_match.group(1)
                 # Will be processed later for cross-file references
                 continue
-                
+
             # Detect message definitions
             message_match = re.match(r'^message\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{', stripped)
             if message_match:
@@ -93,7 +95,7 @@ class gRPCParser:
                 in_message = True
                 brace_depth = 1
                 continue
-                
+
             # Detect service definitions
             service_match = re.match(r'^service\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{', stripped)
             if service_match:
@@ -109,7 +111,7 @@ class gRPCParser:
                 in_service = True
                 brace_depth = 1
                 continue
-                
+
             # Detect enum definitions
             enum_match = re.match(r'^enum\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{', stripped)
             if enum_match:
@@ -125,7 +127,7 @@ class gRPCParser:
                 in_enum = True
                 brace_depth = 1
                 continue
-                
+
             # Parse message fields
             if in_message and current_node and current_node.kind == 'MESSAGE':
                 # Check for closing brace
@@ -133,43 +135,43 @@ class gRPCParser:
                     in_message = False
                     current_node = None
                     continue
-                    
+
                 # Parse field: type name = tag;
                 field_match = re.match(
                     r'^(optional|required|repeated)?\s*([A-Za-z_][A-Za-z0-9_.]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(\d+)\s*(?:\[([^\]]*)\])?\s*;',
                     stripped
                 )
-                
+
                 if field_match:
                     label = field_match.group(1)
                     field_type = field_match.group(2)
                     field_name = field_match.group(3)
                     tag = field_match.group(4)
                     options_str = field_match.group(5)
-                    
+
                     field_info = {
                         'name': field_name,
                         'type': field_type,
                         'tag': int(tag),
                         'label': label or 'optional'
                     }
-                    
+
                     if options_str:
                         field_info['options'] = options_str
-                        
+
                     current_node.fields.append(field_info)
-                    
+
                     # Add type reference edge
                     base_type = field_type.split('.')[-1]  # Handle package prefixes
-                    if base_type not in {'string', 'bytes', 'int32', 'int64', 'uint32', 'uint64', 
-                                         'sint32', 'sint64', 'fixed32', 'fixed64', 'sfixed32', 
+                    if base_type not in {'string', 'bytes', 'int32', 'int64', 'uint32', 'uint64',
+                                         'sint32', 'sint64', 'fixed32', 'fixed64', 'sfixed32',
                                          'sfixed64', 'float', 'double', 'bool'}:
                         self.edges.append((
                             f"{current_node.name}.{field_name}",
                             base_type,
                             {'edge_type': 'uses_type', 'file': file_path, 'line': line_num}
                         ))
-                        
+
             # Parse service RPC methods
             if in_service and current_node and current_node.kind == 'SERVICE':
                 # Check for closing brace
@@ -177,20 +179,20 @@ class gRPCParser:
                     in_service = False
                     current_node = None
                     continue
-                    
+
                 # Parse rpc method
                 rpc_match = re.match(
                     r'^rpc\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(\s*(stream\s+)?([A-Za-z_][A-Za-z0-9_.]*)\s*\)\s*returns\s*\(\s*(stream\s+)?([A-Za-z_][A-Za-z0-9_.]*)\s*\)',
                     stripped
                 )
-                
+
                 if rpc_match:
                     method_name = rpc_match.group(1)
                     client_stream = rpc_match.group(2) is not None
                     request_type = rpc_match.group(3)
                     server_stream = rpc_match.group(4) is not None
                     response_type = rpc_match.group(5)
-                    
+
                     # Determine streaming type
                     if client_stream and server_stream:
                         stream_type = 'bidirectional'
@@ -200,7 +202,7 @@ class gRPCParser:
                         stream_type = 'client_streaming'
                     else:
                         stream_type = 'unary'
-                        
+
                     method_info = {
                         'name': method_name,
                         'request_type': request_type,
@@ -209,34 +211,34 @@ class gRPCParser:
                         'client_streaming': client_stream,
                         'server_streaming': server_stream
                     }
-                    
+
                     current_node.rpc_methods.append(method_info)
-                    
+
                     # Add edges for request/response types
                     req_base = request_type.split('.')[-1]
                     resp_base = response_type.split('.')[-1]
-                    
+
                     full_method_name = f"{current_node.name}.{method_name}"
-                    
+
                     self.edges.append((
                         full_method_name,
                         req_base,
                         {'edge_type': 'accepts_request', 'file': file_path, 'line': line_num}
                     ))
-                    
+
                     self.edges.append((
                         full_method_name,
                         resp_base,
                         {'edge_type': 'returns_response', 'file': file_path, 'line': line_num}
                     ))
-                    
+
             # Parse enum values
             if in_enum and current_node and current_node.kind == 'ENUM':
                 if stripped == '}':
                     in_enum = False
                     current_node = None
                     continue
-                    
+
                 enum_value_match = re.match(r'^([A-Z_][A-Z0-9_]*)\s*=\s*(-?\d+)', stripped)
                 if enum_value_match:
                     value_name = enum_value_match.group(1)
@@ -245,22 +247,22 @@ class gRPCParser:
                         'name': value_name,
                         'value': value_num
                     })
-                    
+
         # Track options and other metadata
         self._parse_options(content, file_path, current_package)
-        
+
     def _parse_options(self, content: str, file_path: str, package: Optional[str]) -> None:
         """Parse proto options (e.g., go_package, java_package, etc.)."""
         option_patterns = [
             r'option\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*["\']([^"\']+)["\'];',
             r'option\s*\(([A-Za-z_][A-Za-z0-9_.]*)\)\s*=\s*([^;]+);'
         ]
-        
+
         for pattern in option_patterns:
             for match in re.finditer(pattern, content):
                 opt_name = match.group(1)
                 opt_value = match.group(2)
-                
+
                 # Store in a special node for file-level options
                 opt_node_name = f"_options_{os.path.basename(file_path)}"
                 if opt_node_name not in self.nodes:
@@ -271,9 +273,9 @@ class gRPCParser:
                         line_number=0,
                         package=package
                     )
-                    
+
                 self.nodes[opt_node_name].options[opt_name] = opt_value
-                
+
     def parse_implementations(self, code_dir: str, languages: List[str] = ['python', 'go', 'java', 'typescript']) -> None:
         """Scan code directory for gRPC service implementations."""
         impl_patterns = {
@@ -296,30 +298,30 @@ class gRPCParser:
                 r'async\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(\s*call',
             ]
         }
-        
+
         for root, dirs, files in os.walk(code_dir):
             # Skip common non-source directories
             dirs[:] = [d for d in dirs if d not in {'node_modules', 'vendor', '.git', '__pycache__', 'build', 'dist'}]
-            
+
             for file in files:
                 file_path = os.path.join(root, file)
                 ext = os.path.splitext(file)[1].lower()
-                
+
                 lang_map = {'.py': 'python', '.go': 'go', '.java': 'java', '.ts': 'typescript', '.js': 'typescript'}
                 lang = lang_map.get(ext)
-                
+
                 if lang not in languages:
                     continue
-                    
+
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        
+
                     for pattern in impl_patterns.get(lang, []):
                         for match in re.finditer(pattern, content):
                             impl_name = match.group(1) if match.lastindex else match.group(0)
                             self.implementation_map[impl_name] = file_path
-                            
+
                             # Try to link to proto definition
                             for node_name in self.nodes:
                                 if node_name.lower() == impl_name.lower().replace('servicer', '').replace('service', ''):
@@ -328,13 +330,12 @@ class gRPCParser:
                                         node_name,
                                         {'edge_type': 'implements_service', 'line': content[:match.start()].count('\n') + 1}
                                     ))
-                except Exception:
-                    pass
-                    
+                except Exception as e:
+                    logger.debug("skipping entry: %s", e)
     def build_graph(self) -> nx.DiGraph:
         """Build NetworkX graph from parsed data."""
         G = nx.DiGraph()
-        
+
         # Add nodes
         for name, node in self.nodes.items():
             G.add_node(
@@ -349,7 +350,7 @@ class gRPCParser:
                 options=node.options,
                 node_type='grpc'
             )
-            
+
         # Add edges
         for source, target, attrs in self.edges:
             # Relation endpoints arrive as "<Parent>.<child>" (e.g. "User.GetUser"
@@ -368,7 +369,7 @@ class gRPCParser:
                     # Create placeholder node for external types
                     G.add_node(target, kind='EXTERNAL_TYPE', node_type='grpc')
                 G.add_edge(source, target, **attrs)
-                
+
         # Add implementation edges
         for code_path, service_name in self.implementation_map.items():
             # Try to find matching service
@@ -381,7 +382,7 @@ class gRPCParser:
                             edge_type='implements_service',
                             node_type='code_to_grpc'
                         )
-                        
+
         return G
 
 
@@ -391,25 +392,25 @@ def extract_proto_files(directory: str) -> List[str]:
     for root, dirs, files in os.walk(directory):
         # Skip common non-source directories
         dirs[:] = [d for d in dirs if d not in {'node_modules', 'vendor', '.git', '__pycache__', 'build', 'dist'}]
-        
+
         for file in files:
             if file.endswith('.proto'):
                 proto_files.append(os.path.join(root, file))
-                
+
     return proto_files
 
 
 def parse_grpc_project(directory: str, include_implementations: bool = True) -> nx.DiGraph:
     """Main entry point for gRPC parsing."""
     parser = gRPCParser()
-    
+
     # Parse proto files
     proto_files = extract_proto_files(directory)
     for file_path in proto_files:
         parser.parse_file(file_path)
-        
+
     # Parse implementations
     if include_implementations:
         parser.parse_implementations(directory)
-        
+
     return parser.build_graph()

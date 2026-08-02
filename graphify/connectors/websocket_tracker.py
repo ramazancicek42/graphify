@@ -14,6 +14,8 @@ import os
 from typing import Dict, List, Set, Tuple, Optional, Any
 from dataclasses import dataclass, field
 import networkx as nx
+import logging
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -30,14 +32,14 @@ class WSNode:
 
 class WebSocketTracker:
     """Tracks WebSocket connections and message flows."""
-    
+
     def __init__(self):
         self.nodes: Dict[str, WSNode] = {}
         self.edges: List[Tuple[str, str, Dict[str, Any]]] = []
-        
+
     def parse_websocket_servers(self, code_dir: str, languages: List[str] = ['python', 'javascript', 'typescript', 'java', 'go']) -> None:
         """Scan code for WebSocket server definitions."""
-        
+
         ws_server_patterns = {
             'python': {
                 'server': [
@@ -97,32 +99,32 @@ class WebSocketTracker:
                 ]
             }
         }
-        
+
         for root, dirs, files in os.walk(code_dir):
             dirs[:] = [d for d in dirs if d not in {'node_modules', 'vendor', '.git', '__pycache__', 'build', 'dist'}]
-            
+
             for file in files:
                 file_path = os.path.join(root, file)
                 ext = os.path.splitext(file)[1].lower()
-                
+
                 lang_map = {'.py': 'python', '.js': 'javascript', '.ts': 'typescript', '.java': 'java', '.go': 'go'}
                 lang = lang_map.get(ext)
-                
+
                 if lang not in languages:
                     continue
-                    
+
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        
+
                     lines = content.split('\n')
-                    
+
                     # Find server endpoints
                     for pattern in ws_server_patterns.get(lang, {}).get('server', []):
                         for match in re.finditer(pattern, content):
                             endpoint_path = None
                             port = None
-                            
+
                             if match.lastindex:
                                 groups = match.groups()
                                 if len(groups) >= 2:
@@ -132,13 +134,13 @@ class WebSocketTracker:
                                             endpoint_path = g
                                         elif g and g.isdigit():
                                             port = int(g)
-                                            
+
                             if not endpoint_path:
                                 endpoint_path = f"/ws_{match.start()}"
-                                
+
                             node_name = f"ws_server_{os.path.basename(file_path)}_{match.start()}"
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             self.nodes[node_name] = WSNode(
                                 name=node_name,
                                 kind='SERVER_ENDPOINT',
@@ -147,13 +149,13 @@ class WebSocketTracker:
                                 endpoint_path=endpoint_path or '/ws',
                                 protocols=['websocket']
                             )
-                            
+
                     # Find message handlers
                     for pattern in ws_server_patterns.get(lang, {}).get('handler', []):
                         for match in re.finditer(pattern, content):
                             handler_name = match.group(1) if match.lastindex else match.group(0)
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             # Determine handler type
                             handler_type = 'generic'
                             if 'message' in handler_name.lower() or 'on_message' in handler_name.lower():
@@ -164,9 +166,9 @@ class WebSocketTracker:
                                 handler_type = 'on_close'
                             elif 'error' in handler_name.lower() or 'on_error' in handler_name.lower() or 'onerror' in handler_name.lower():
                                 handler_type = 'on_error'
-                                
+
                             handler_node = f"ws_handler_{handler_name}_{match.start()}"
-                            
+
                             self.nodes[handler_node] = WSNode(
                                 name=handler_name,
                                 kind='HANDLER',
@@ -174,36 +176,35 @@ class WebSocketTracker:
                                 line_number=line_num,
                                 message_handlers={'type': handler_type}
                             )
-                            
+
                             # Link handler to nearest server endpoint
                             self._link_handler_to_server(handler_node, file_path, match.start())
-                            
-                except Exception:
-                    pass
-                    
+
+                except Exception as e:
+                    logger.debug("skipping entry: %s", e)
     def _link_handler_to_server(self, handler_node: str, file_path: str, position: int) -> None:
         """Link a handler to its nearest server endpoint."""
         # Find the closest server endpoint in the same file
         closest_server = None
         min_distance = float('inf')
-        
+
         for node_name, node in self.nodes.items():
             if node.kind == 'SERVER_ENDPOINT' and node.file_path == file_path:
                 distance = abs(position - (node.line_number or 0))
                 if distance < min_distance:
                     min_distance = distance
                     closest_server = node_name
-                    
+
         if closest_server:
             self.edges.append((
                 handler_node,
                 closest_server,
                 {'edge_type': 'handles_for', 'file': file_path}
             ))
-            
+
     def parse_websocket_clients(self, code_dir: str, languages: List[str] = ['python', 'javascript', 'typescript', 'java', 'go', 'swift', 'kotlin']) -> None:
         """Scan code for WebSocket client connections."""
-        
+
         ws_client_patterns = {
             'python': {
                 'client': [
@@ -254,35 +255,35 @@ class WebSocketTracker:
                 ]
             }
         }
-        
+
         for root, dirs, files in os.walk(code_dir):
             dirs[:] = [d for d in dirs if d not in {'node_modules', 'vendor', '.git', '__pycache__', 'build', 'dist'}]
-            
+
             for file in files:
                 file_path = os.path.join(root, file)
                 ext = os.path.splitext(file)[1].lower()
-                
+
                 lang_map = {
                     '.py': 'python', '.js': 'javascript', '.ts': 'typescript',
                     '.java': 'java', '.go': 'go', '.swift': 'swift', '.kt': 'kotlin'
                 }
                 lang = lang_map.get(ext)
-                
+
                 if lang not in languages:
                     continue
-                    
+
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        
+
                     # Find client connections
                     for pattern in ws_client_patterns.get(lang, {}).get('client', []):
                         for match in re.finditer(pattern, content):
                             ws_url = match.group(1) if match.lastindex else 'unknown'
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             client_node = f"ws_client_{os.path.basename(file_path)}_{match.start()}"
-                            
+
                             self.nodes[client_node] = WSNode(
                                 name=client_node,
                                 kind='CLIENT',
@@ -290,15 +291,15 @@ class WebSocketTracker:
                                 line_number=line_num,
                                 endpoint_path=ws_url
                             )
-                            
+
                     # Find message sends (for tracking message types)
                     for pattern in ws_client_patterns.get(lang, {}).get('send', []):
                         for match in re.finditer(pattern, content):
                             msg_type = match.group(1) if match.lastindex else 'unknown'
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             msg_node = f"ws_message_{msg_type}_{match.start()}"
-                            
+
                             if msg_node not in self.nodes:
                                 self.nodes[msg_node] = WSNode(
                                     name=msg_type,
@@ -306,14 +307,13 @@ class WebSocketTracker:
                                     file_path=file_path,
                                     line_number=line_num
                                 )
-                                
-                except Exception:
-                    pass
-                    
+
+                except Exception as e:
+                    logger.debug("skipping entry: %s", e)
     def build_graph(self) -> nx.DiGraph:
         """Build NetworkX graph from parsed WebSocket data."""
         G = nx.DiGraph()
-        
+
         # Add nodes
         for name, node in self.nodes.items():
             G.add_node(
@@ -326,28 +326,28 @@ class WebSocketTracker:
                 message_handlers=node.message_handlers,
                 node_type='websocket'
             )
-            
+
         # Add edges
         for source, target, attrs in self.edges:
             if source in G.nodes and target in G.nodes:
                 G.add_edge(source, target, **attrs)
-                
+
         # Add client-to-server connection edges
         self._add_connection_edges(G)
-        
+
         return G
-        
+
     def _add_connection_edges(self, G: nx.DiGraph) -> None:
         """Add edges connecting clients to servers based on endpoint paths."""
         clients = [(name, node) for name, node in self.nodes.items() if node.kind == 'CLIENT']
         servers = [(name, node) for name, node in self.nodes.items() if node.kind == 'SERVER_ENDPOINT']
-        
+
         for client_name, client_node in clients:
             client_path = client_node.endpoint_path or ''
-            
+
             for server_name, server_node in servers:
                 server_path = server_node.endpoint_path or ''
-                
+
                 # Simple path matching
                 if client_path and server_path and (client_path == server_path or client_path.endswith(server_path)):
                     G.add_edge(
@@ -361,11 +361,11 @@ class WebSocketTracker:
 def parse_websocket_project(directory: str) -> nx.DiGraph:
     """Main entry point for WebSocket parsing."""
     tracker = WebSocketTracker()
-    
+
     # Parse servers
     tracker.parse_websocket_servers(directory)
-    
+
     # Parse clients
     tracker.parse_websocket_clients(directory)
-    
+
     return tracker.build_graph()

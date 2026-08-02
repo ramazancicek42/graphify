@@ -31,13 +31,13 @@ class BrokenChainDetector:
     def _detect_di_breaks(self) -> List[BrokenChain]:
         """Dependency Injection zincirindeki kopuklukları bul."""
         breaks = []
-        
+
         # @Inject veya @HiltInject ile işaretlenmiş node'ları bul
         injected_nodes = [
             (node, data) for node, data in self.graph.nodes(data=True)
             if data.get('annotation') in ['@Inject', '@HiltInject', '@AndroidEntryPoint']
         ]
-        
+
         for node, data in injected_nodes:
             # Constructor parametrelerini kontrol et
             constructor_params = data.get('constructor_params', [])
@@ -55,13 +55,13 @@ class BrokenChainDetector:
                             severity="CRITICAL",
                             fix_suggestion=f"{param_type} için bir Module tanımlayın veya @Provide ekleyin."
                         ))
-        
+
         # Module sınıflarında eksik @Provides
         module_nodes = [
             (node, data) for node, data in self.graph.nodes(data=True)
             if data.get('annotation') == '@Module' or data.get('annotation') == '@InstallIn'
         ]
-        
+
         for node, data in module_nodes:
             provided_types = data.get('provides', [])
             # Module'da tanımlanan ama implementasyonu olmayan tipler
@@ -76,25 +76,25 @@ class BrokenChainDetector:
                         severity="WARNING",
                         fix_suggestion=f"{p_type} sınıfının varlığını kontrol edin."
                     ))
-        
+
         return breaks
 
     def _detect_navigation_breaks(self) -> List[BrokenChain]:
         """Navigation Graph ve kod arasındaki uyumsuzlukları bul."""
         breaks = []
-        
+
         # nav_graph.xml'deki destination'ları bul
         nav_destinations = set()
         for node, data in self.graph.nodes(data=True):
             if data.get('file', '').endswith('nav_graph.xml'):
                 nav_destinations.update(data.get('destinations', []))
-        
+
         # Kod içindeki navigate çağrılarını bul
         navigate_calls = []
         for node, data in self.graph.nodes(data=True):
             if 'navigate' in data.get('methods', []):
                 navigate_calls.extend(data.get('navigate_targets', []))
-        
+
         # Graf'ta olmayan destination'ları tespit et
         for target in navigate_calls:
             if target not in nav_destinations:
@@ -109,13 +109,13 @@ class BrokenChainDetector:
                         severity="CRITICAL",
                         fix_suggestion=f"nav_graph.xml'e {target} destination'ını ekleyin."
                     ))
-        
+
         return breaks
 
     def _detect_intent_breaks(self) -> List[BrokenChain]:
         """Intent filter ve başlatma uyumsuzluklarını bul."""
         breaks = []
-        
+
         # Manifest'teki Activity/Service filtrelerini al
         manifest_filters = {}
         for node, data in self.graph.nodes(data=True):
@@ -124,7 +124,7 @@ class BrokenChainDetector:
                 for f in filters:
                     if 'action' in f:
                         manifest_filters[f['action']] = data.get('name')
-        
+
         # Kod içindeki Implicit Intent çağrılarını kontrol et
         for node, data in self.graph.nodes(data=True):
             implicit_intents = data.get('implicit_intents', [])
@@ -139,13 +139,13 @@ class BrokenChainDetector:
                         severity="CRITICAL",
                         fix_suggestion=f"AndroidManifest.xml'e {intent_action} action'ına sahip component ekleyin."
                     ))
-        
+
         return breaks
 
     def _detect_data_flow_breaks(self) -> List[BrokenChain]:
         """LiveData/Flow veri akışındaki kopuklukları bul."""
         breaks = []
-        
+
         # ViewModel'de tanımlanan LiveData/Flow'ları bul
         viewmodel_flows = {}
         for node, data in self.graph.nodes(data=True):
@@ -153,12 +153,12 @@ class BrokenChainDetector:
                 flows = data.get('observable_fields', [])
                 for flow in flows:
                     viewmodel_flows[flow] = node
-        
+
         # Observer olarak kaydedilenleri bul
         observers = []
         for node, data in self.graph.nodes(data=True):
             observers.extend(data.get('observers', []))
-        
+
         # Gözlemlenmeyen Flow'lar
         for flow_name, vm_node in viewmodel_flows.items():
             if flow_name not in observers:
@@ -171,7 +171,7 @@ class BrokenChainDetector:
                     severity="WARNING",
                     fix_suggestion="İlgili UI component'inde observe() ekleyin veya gereksizse silin."
                 ))
-        
+
         return breaks
 
     def _node_exists_with_type(self, type_name: str) -> bool:
@@ -191,13 +191,13 @@ class BrokenChainDetector:
     def generate_report(self, breaks: List[BrokenChain]) -> str:
         if not breaks:
             return "✅ Kırık zincir tespit edilmedi. Tüm akışlar sağlam!"
-        
+
         report = "## 🚨 Kırık Zincir Analizi\n\n"
-        
+
         # Kritik olanları önce göster
         critical = [b for b in breaks if b.severity == "CRITICAL"]
         warnings = [b for b in breaks if b.severity == "WARNING"]
-        
+
         if critical:
             report += "### 🔴 Kritik Sorunlar\n\n"
             for i, b in enumerate(critical, 1):
@@ -205,13 +205,13 @@ class BrokenChainDetector:
                 report += f"- **Açıklama:** {b.description}\n"
                 report += f"- **Eksik Bağ:** `{b.missing_link}`\n"
                 report += f"- **Çözüm:** {b.fix_suggestion}\n\n"
-        
+
         if warnings:
             report += "### ⚠️ Uyarılar\n\n"
             for i, b in enumerate(warnings, 1):
                 report += f"**{i}. {b.chain_type}**\n"
                 report += f"- {b.description}\n"
                 report += f"- Öneri: {b.fix_suggestion}\n\n"
-        
+
         report += f"**Toplam:** {len(breaks)} sorun ({len(critical)} kritik, {len(warnings)} uyarı)"
         return report

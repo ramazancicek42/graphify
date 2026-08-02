@@ -14,6 +14,8 @@ import os
 from typing import Dict, List, Set, Tuple, Optional, Any
 from dataclasses import dataclass, field
 import networkx as nx
+import logging
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -30,16 +32,16 @@ class MQNode:
 
 class MessageQueueParser:
     """Parses Kafka and RabbitMQ configurations and code."""
-    
+
     def __init__(self):
         self.nodes: Dict[str, MQNode] = {}
         self.edges: List[Tuple[str, str, Dict[str, Any]]] = []
-        
+
     # ========== KAFKA PARSING ==========
-    
+
     def parse_kafka_topics_from_code(self, code_dir: str, languages: List[str] = ['python', 'java', 'javascript', 'typescript', 'go']) -> None:
         """Scan code for Kafka topic definitions and producer/consumer patterns."""
-        
+
         kafka_patterns = {
             'python': {
                 'topic_def': [
@@ -118,32 +120,32 @@ class MessageQueueParser:
                 ]
             }
         }
-        
+
         for root, dirs, files in os.walk(code_dir):
             dirs[:] = [d for d in dirs if d not in {'node_modules', 'vendor', '.git', '__pycache__', 'build', 'dist'}]
-            
+
             for file in files:
                 file_path = os.path.join(root, file)
                 ext = os.path.splitext(file)[1].lower()
-                
+
                 lang_map = {'.py': 'python', '.java': 'java', '.js': 'javascript', '.ts': 'typescript', '.go': 'go'}
                 lang = lang_map.get(ext)
-                
+
                 if lang not in languages:
                     continue
-                    
+
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        
+
                     lines = content.split('\n')
-                    
+
                     # Find topics
                     for pattern in kafka_patterns.get(lang, {}).get('topic_def', []):
                         for match in re.finditer(pattern, content):
                             topic_name = match.group(1)
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             if topic_name not in self.nodes:
                                 self.nodes[topic_name] = MQNode(
                                     name=topic_name,
@@ -152,7 +154,7 @@ class MessageQueueParser:
                                     file_path=file_path,
                                     line_number=line_num
                                 )
-                                
+
                     # Find producers
                     for pattern in kafka_patterns.get(lang, {}).get('producer', []):
                         for match in re.finditer(pattern, content):
@@ -168,13 +170,13 @@ class MessageQueueParser:
                                         line_number=content[:match.start()].count('\n') + 1,
                                         properties={'function': match.group(0)[:50]}
                                     )
-                                    
+
                                 self.edges.append((
                                     producer_node,
                                     topic_name,
                                     {'edge_type': 'produces_to', 'file': file_path}
                                 ))
-                                
+
                     # Find consumers
                     for pattern in kafka_patterns.get(lang, {}).get('consumer', []):
                         for match in re.finditer(pattern, content):
@@ -189,19 +191,19 @@ class MessageQueueParser:
                                         file_path=file_path,
                                         line_number=content[:match.start()].count('\n') + 1
                                     )
-                                    
+
                                 self.edges.append((
                                     topic_name,
                                     consumer_node,
                                     {'edge_type': 'consumed_by', 'file': file_path}
                                 ))
-                                
+
                     # Find consumer groups
                     for pattern in kafka_patterns.get(lang, {}).get('consumer_group', []):
                         for match in re.finditer(pattern, content):
                             group_id = match.group(1)
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             group_node = f"_group_{group_id}"
                             if group_node not in self.nodes:
                                 self.nodes[group_node] = MQNode(
@@ -211,15 +213,14 @@ class MessageQueueParser:
                                     file_path=file_path,
                                     line_number=line_num
                                 )
-                                
-                except Exception:
-                    pass
-                    
+
+                except Exception as e:
+                    logger.debug("skipping entry: %s", e)
     # ========== RABBITMQ PARSING ==========
-    
+
     def parse_rabbitmq_from_code(self, code_dir: str, languages: List[str] = ['python', 'java', 'javascript', 'typescript', 'go']) -> None:
         """Scan code for RabbitMQ exchanges, queues, and bindings."""
-        
+
         rabbitmq_patterns = {
             'python': {
                 'exchange': [
@@ -263,30 +264,30 @@ class MessageQueueParser:
                 ]
             }
         }
-        
+
         for root, dirs, files in os.walk(code_dir):
             dirs[:] = [d for d in dirs if d not in {'node_modules', 'vendor', '.git', '__pycache__', 'build', 'dist'}]
-            
+
             for file in files:
                 file_path = os.path.join(root, file)
                 ext = os.path.splitext(file)[1].lower()
-                
+
                 lang_map = {'.py': 'python', '.js': 'javascript', '.ts': 'javascript'}
                 lang = lang_map.get(ext)
-                
+
                 if lang not in languages:
                     continue
-                    
+
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        
+
                     # Find exchanges
                     for pattern in rabbitmq_patterns.get(lang, {}).get('exchange', []):
                         for match in re.finditer(pattern, content):
                             exchange_name = match.group(1)
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             if exchange_name not in self.nodes:
                                 self.nodes[exchange_name] = MQNode(
                                     name=exchange_name,
@@ -295,13 +296,13 @@ class MessageQueueParser:
                                     file_path=file_path,
                                     line_number=line_num
                                 )
-                                
+
                     # Find queues
                     for pattern in rabbitmq_patterns.get(lang, {}).get('queue', []):
                         for match in re.finditer(pattern, content):
                             queue_name = match.group(1)
                             line_num = content[:match.start()].count('\n') + 1
-                            
+
                             if queue_name not in self.nodes:
                                 self.nodes[queue_name] = MQNode(
                                     name=queue_name,
@@ -310,7 +311,7 @@ class MessageQueueParser:
                                     file_path=file_path,
                                     line_number=line_num
                                 )
-                                
+
                     # Find bindings
                     for pattern in rabbitmq_patterns.get(lang, {}).get('binding', []):
                         for match in re.finditer(pattern, content):
@@ -318,9 +319,9 @@ class MessageQueueParser:
                                 queue_name = match.group(1)
                                 exchange_name = match.group(2)
                                 routing_key = match.group(3) if match.lastindex >= 3 else '#'
-                                
+
                                 binding_name = f"{queue_name}_binds_{exchange_name}"
-                                
+
                                 if binding_name not in self.nodes:
                                     self.nodes[binding_name] = MQNode(
                                         name=binding_name,
@@ -330,20 +331,20 @@ class MessageQueueParser:
                                         line_number=content[:match.start()].count('\n') + 1,
                                         properties={'routing_key': routing_key}
                                     )
-                                    
+
                                 self.edges.append((
                                     queue_name,
                                     exchange_name,
                                     {'edge_type': 'bound_to', 'routing_key': routing_key, 'file': file_path}
                                 ))
-                                
+
                     # Find publishers
                     for pattern in rabbitmq_patterns.get(lang, {}).get('publish', []):
                         for match in re.finditer(pattern, content):
                             if match.lastindex and match.lastindex >= 2:
                                 exchange_name = match.group(1)
                                 routing_key = match.group(2)
-                                
+
                                 publisher_node = f"_publisher_{os.path.basename(file_path)}_{match.start()}"
                                 if publisher_node not in self.nodes:
                                     self.nodes[publisher_node] = MQNode(
@@ -353,18 +354,18 @@ class MessageQueueParser:
                                         file_path=file_path,
                                         line_number=content[:match.start()].count('\n') + 1
                                     )
-                                    
+
                                 self.edges.append((
                                     publisher_node,
                                     exchange_name,
                                     {'edge_type': 'publishes_to', 'routing_key': routing_key, 'file': file_path}
                                 ))
-                                
+
                     # Find consumers
                     for pattern in rabbitmq_patterns.get(lang, {}).get('consume', []):
                         for match in re.finditer(pattern, content):
                             queue_name = match.group(1)
-                            
+
                             consumer_node = f"_consumer_{os.path.basename(file_path)}_{match.start()}"
                             if consumer_node not in self.nodes:
                                 self.nodes[consumer_node] = MQNode(
@@ -374,20 +375,19 @@ class MessageQueueParser:
                                     file_path=file_path,
                                     line_number=content[:match.start()].count('\n') + 1
                                 )
-                                
+
                                 self.edges.append((
                                     queue_name,
                                     consumer_node,
                                     {'edge_type': 'consumed_by', 'file': file_path}
                                 ))
-                                
-                except Exception:
-                    pass
-                    
+
+                except Exception as e:
+                    logger.debug("skipping entry: %s", e)
     def build_graph(self) -> nx.DiGraph:
         """Build NetworkX graph from parsed MQ data."""
         G = nx.DiGraph()
-        
+
         # Add nodes
         for name, node in self.nodes.items():
             G.add_node(
@@ -399,23 +399,23 @@ class MessageQueueParser:
                 properties=node.properties,
                 node_type='message_queue'
             )
-            
+
         # Add edges
         for source, target, attrs in self.edges:
             if source in G.nodes and target in G.nodes:
                 G.add_edge(source, target, **attrs)
-                
+
         return G
 
 
 def parse_mq_project(directory: str, brokers: List[str] = ['kafka', 'rabbitmq']) -> nx.DiGraph:
     """Main entry point for Message Queue parsing."""
     parser = MessageQueueParser()
-    
+
     if 'kafka' in brokers:
         parser.parse_kafka_topics_from_code(directory)
-        
+
     if 'rabbitmq' in brokers:
         parser.parse_rabbitmq_from_code(directory)
-        
+
     return parser.build_graph()

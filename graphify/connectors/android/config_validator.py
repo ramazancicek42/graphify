@@ -39,17 +39,17 @@ class ConfigValidator:
             if 'AndroidManifest.xml' in data.get('file', ''):
                 manifest_node = data
                 break
-        
+
         if not manifest_node:
             return
-        
+
         declared_perms = set(manifest_node.get('permissions', []))
         used_perms = set()
-        
+
         # Kodda kullanılan izinleri topla
         for node, data in self.graph.nodes(data=True):
             used_perms.update(data.get('required_permissions', []))
-        
+
         # Kullanılan ama tanımlanmayan izinler
         missing_perms = used_perms - declared_perms
         for perm in missing_perms:
@@ -62,7 +62,7 @@ class ConfigValidator:
                 expected_value=perm,
                 fix_suggestion=f"<uses-permission android:name=\"{perm}\" /> ekleyin."
             ))
-        
+
         # Tanımlanan ama kullanılmayan izinler (gereksiz)
         unused_perms = declared_perms - used_perms
         for perm in unused_perms:
@@ -81,20 +81,20 @@ class ConfigValidator:
         """SDK versiyon tutarlılığı."""
         build_gradle_data = None
         manifest_data = None
-        
+
         for node, data in self.graph.nodes(data=True):
             if 'build.gradle' in data.get('file', ''):
                 build_gradle_data = data
             if 'AndroidManifest.xml' in data.get('file', ''):
                 manifest_data = data
-        
+
         if not build_gradle_data:
             return
-        
+
         min_sdk = build_gradle_data.get('minSdkVersion')
         target_sdk = build_gradle_data.get('targetSdkVersion')
         compile_sdk = build_gradle_data.get('compileSdkVersion')
-        
+
         # Hedef SDK güncel olmalı
         if target_sdk and target_sdk < 33:  # En az Android 13
             self.issues.append(ConfigIssue(
@@ -106,7 +106,7 @@ class ConfigValidator:
                 expected_value=">= 33",
                 fix_suggestion="targetSdkVersion'ı en az 33 yapın."
             ))
-        
+
         # Compile SDK >= Target SDK olmalı
         if compile_sdk and target_sdk and compile_sdk < target_sdk:
             self.issues.append(ConfigIssue(
@@ -118,7 +118,7 @@ class ConfigValidator:
                 expected_value=f">= {target_sdk}",
                 fix_suggestion=f"compileSdkVersion'ı {target_sdk} veya üzerine çıkarın."
             ))
-        
+
         # Min SDK çok düşük mü?
         if min_sdk and min_sdk < 21:
             self.issues.append(ConfigIssue(
@@ -134,7 +134,7 @@ class ConfigValidator:
     def _validate_app_id_consistency(self):
         """Application ID tutarlılığı."""
         app_ids = set()
-        
+
         for node, data in self.graph.nodes(data=True):
             if 'build.gradle' in data.get('file', ''):
                 if 'applicationId' in data:
@@ -142,7 +142,7 @@ class ConfigValidator:
             if 'AndroidManifest.xml' in data.get('file', ''):
                 if 'package' in data:
                     app_ids.add(data['package'])
-        
+
         if len(app_ids) > 1:
             self.issues.append(ConfigIssue(
                 issue_type="APP_ID_MISMATCH",
@@ -158,15 +158,15 @@ class ConfigValidator:
         """Güvenlik yapılandırması."""
         uses_cleartext = False
         has_network_config = False
-        
+
         for node, data in self.graph.nodes(data=True):
             if 'AndroidManifest.xml' in data.get('file', ''):
                 uses_cleartext = data.get('usesCleartextTraffic', False)
                 has_network_config = 'networkSecurityConfig' in data
-            
+
             if 'network_security_config.xml' in data.get('file', ''):
                 has_network_config = True
-        
+
         if uses_cleartext and not has_network_config:
             self.issues.append(ConfigIssue(
                 issue_type="INSECURE_TRAFFIC",
@@ -177,7 +177,7 @@ class ConfigValidator:
                 expected_value="HTTPS only veya güvenli config",
                 fix_suggestion="network_security_config.xml ekleyin veya usesCleartextTraffic=false yapın."
             ))
-        
+
         # API anahtarları hardcoded mı?
         for node, data in self.graph.nodes(data=True):
             if 'api_key' in data.get('content', '').lower() or 'apikey' in data.get('content', '').lower():
@@ -196,18 +196,18 @@ class ConfigValidator:
         """Özellik bayrakları ve build types."""
         flavor_dims = set()
         build_types = set()
-        
+
         for node, data in self.graph.nodes(data=True):
             if 'build.gradle' in data.get('file', ''):
                 flavor_dims.update(data.get('flavorDimensions', []))
                 build_types.update(data.get('buildTypes', []))
-        
+
         # Product flavor tanımlıysa ama dimension yoksa
         flavors = []
         for node, data in self.graph.nodes(data=True):
             if 'productFlavors' in data:
                 flavors.extend(data.get('productFlavors', []))
-        
+
         if flavors and not flavor_dims:
             self.issues.append(ConfigIssue(
                 issue_type="MISSING_FLAVOR_DIMENSION",
@@ -222,13 +222,13 @@ class ConfigValidator:
     def generate_report(self) -> str:
         if not self.issues:
             return "✅ Yapılandırma sorunları tespit edilmedi!"
-        
+
         report = "## 🔧 Yapılandırma Doğrulama Raporu\n\n"
-        
+
         errors = [i for i in self.issues if i.severity == "ERROR"]
         warnings = [i for i in self.issues if i.severity == "WARNING"]
         infos = [i for i in self.issues if i.severity == "INFO"]
-        
+
         if errors:
             report += "### 🔴 Hatalar\n\n"
             for i, issue in enumerate(errors, 1):
@@ -236,7 +236,7 @@ class ConfigValidator:
                 report += f"- 📁 Dosya: `{issue.file_path}`\n"
                 report += f"- ❌ Sorun: {issue.description}\n"
                 report += f"- ✅ Çözüm: {issue.fix_suggestion}\n\n"
-        
+
         if warnings:
             report += "### ⚠️ Uyarılar\n\n"
             for i, issue in enumerate(warnings, 1):
@@ -244,12 +244,12 @@ class ConfigValidator:
                 report += f"- 📁 Dosya: `{issue.file_path}`\n"
                 report += f"- ⚠️ Sorun: {issue.description}\n"
                 report += f"- 💡 Öneri: {issue.fix_suggestion}\n\n"
-        
+
         if infos:
             report += "### ℹ️ Bilgiler\n\n"
             for i, issue in enumerate(infos, 1):
                 report += f"**{i}. {issue.issue_type}**\n"
                 report += f"- {issue.description}\n\n"
-        
+
         report += f"**Özet:** {len(errors)} hata, {len(warnings)} uyarı, {len(infos)} bilgi"
         return report

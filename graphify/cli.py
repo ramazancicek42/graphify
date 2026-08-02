@@ -3897,6 +3897,75 @@ def dispatch_command(cmd: str) -> None:
         exit_code = diagnose_error_log(log_file, graph_file, output_file)
         sys.exit(exit_code)
 
+    elif cmd == "connectors":
+        # graphify connectors <source_dir> [--language <lang>] [--all]
+        # Runs the full-stack connector scanners (cross-layer palooza) over a
+        # project and prints a consolidated report for downstream AI analysis.
+        from graphify.connectors import (
+            CrossLayerParser,
+            GraphQLParser,
+            gRPCParser,
+            MessageQueueParser,
+            CloudResourceMapper,
+        )
+        if len(sys.argv) < 3:
+            print("Usage: graphify connectors <source_dir> [--language <lang>] [--all]", file=sys.stderr)
+            print("  Scans a project for cross-layer, GraphQL, gRPC, message-queue and cloud resources.", file=sys.stderr)
+            sys.exit(1)
+        source_dir = sys.argv[2]
+        languages = ["python", "javascript", "typescript", "go", "java"]
+        scan_all = False
+        i = 3
+        while i < len(sys.argv):
+            if sys.argv[i] == "--language" and i + 1 < len(sys.argv):
+                languages = [sys.argv[i + 1]]; i += 2
+            elif sys.argv[i] == "--all":
+                scan_all = True; i += 1
+            else:
+                i += 1
+
+        report = {"source_dir": source_dir}
+
+        parser = CrossLayerParser()
+        parser.scan_directory(source_dir)
+        parser.build_connections()
+        report["cross_layer"] = parser.get_summary()
+
+        if scan_all:
+            mq = MessageQueueParser()
+            mq.parse_kafka_topics_from_code(source_dir, languages=languages)
+            mq.parse_rabbitmq_from_code(source_dir)
+            mq_g = mq.build_graph()
+            report["message_queues"] = {
+                "nodes": mq_g.number_of_nodes(),
+                "edges": mq_g.number_of_edges(),
+            }
+
+            gql = GraphQLParser()
+            grpc = gRPCParser()
+            cloud = CloudResourceMapper()
+            findings = {"kinds": {}, "dirs_scanned": []}
+            for root, _dirs, files in os.walk(source_dir):
+                for fname in files:
+                    path = os.path.join(root, fname)
+                    if fname.endswith((".graphql", ".graphqls")):
+                        gql.parse_file(path)
+                    elif fname.endswith(".proto"):
+                        grpc.parse_file(path)
+            gql_g = gql.build_graph()
+            grpc_g = grpc.build_graph()
+            report["graphql"] = {"nodes": gql_g.number_of_nodes(), "edges": gql_g.number_of_edges()}
+            report["grpc"] = {"nodes": grpc_g.number_of_nodes(), "edges": grpc_g.number_of_edges()}
+            cloud.parse_terraform(source_dir)
+            cloud.parse_docker_compose(source_dir)
+            cloud.parse_kubernetes(source_dir)
+            cloud.link_code_to_cloud(source_dir)
+            cloud_g = cloud.build_graph()
+            report["cloud"] = {"nodes": cloud_g.number_of_nodes(), "edges": cloud_g.number_of_edges()}
+
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        sys.exit(0)
+
     elif cmd == "diagnose":
         # User ran `graphify <path>` directly — treat as `graphify extract <path>`.
         # Common when following the PowerShell note in README (`graphify .`) or

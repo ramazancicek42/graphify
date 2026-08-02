@@ -50,7 +50,7 @@ class GraphNode:
     file_path: str
     line_number: int
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Sözlük temsili"""
         return {
@@ -71,7 +71,7 @@ class GraphEdge:
     target: str
     type: ConnectionType
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Sözlük temsili"""
         return {
@@ -85,58 +85,58 @@ class GraphEdge:
 class UnifiedGraphBuilder:
     """
     Full-stack bilgi grafiği oluşturucu.
-    
+
     Kullanım:
         builder = UnifiedGraphBuilder()
         builder.from_directory("/path/to/project")
         graph = builder.build()
-        
+
         # Subgraph çıkar
         subgraph = builder.extract_subgraph(query="Kullanıcı profil güncelleme")
-        
+
         # LLM için optimize et
         context = builder.to_llm_context(subgraph)
     """
-    
+
     def __init__(self):
         self.parser = CrossLayerParser()
         self.graph = nx.MultiDiGraph()
         self.nodes: Dict[str, GraphNode] = {}
         self.edges: List[GraphEdge] = []
         self._node_counter = 0
-    
+
     def from_directory(self, root_path: str) -> 'UnifiedGraphBuilder':
         """
         Proje dizinini tarayarak grafı oluştur.
-        
+
         Args:
             root_path: Tarancak proje kök dizini
-            
+
         Returns:
             Kendi referansı (method chaining için)
         """
         self.parser.scan_directory(root_path)
         self._build_graph_from_parser()
         return self
-    
+
     def from_parser(self, parser: CrossLayerParser) -> 'UnifiedGraphBuilder':
         """
         Mevcut parser'dan graf oluştur.
-        
+
         Args:
             parser: Önceden taranmış CrossLayerParser örneği
-            
+
         Returns:
             Kendi referansı
         """
         self.parser = parser
         self._build_graph_from_parser()
         return self
-    
+
     def _generate_node_id(self, obj: Any, prefix: str) -> str:
         """Benzersiz düğüm ID'si oluştur"""
         self._node_counter += 1
-        
+
         # İçeriğe dayalı hash oluştur
         if isinstance(obj, APICall):
             content = f"{obj.file_path}:{obj.line_number}:{obj.endpoint}"
@@ -148,22 +148,22 @@ class UnifiedGraphBuilder:
             content = f"{obj.file_path}:{obj.table_name}"
         else:
             content = f"{prefix}:{self._node_counter}"
-        
+
         hash_suffix = hashlib.md5(content.encode()).hexdigest()[:8]
         return f"{prefix}_{hash_suffix}"
-    
+
     def _build_graph_from_parser(self):
         """Parser verilerinden grafı inşa et"""
         # API çağrılarını ekle
         for call in self.parser.api_calls:
             node_id = self._generate_node_id(call, "api_call")
-            
+
             # Çağrıyı yapan fonksiyon düğümü
             func_id = self._generate_node_id(
                 type('obj', (object,), {'file_path': call.file_path, 'name': call.function_name}),
                 "func"
             )
-            
+
             if func_id not in self.nodes:
                 func_node = GraphNode(
                     id=func_id,
@@ -176,7 +176,7 @@ class UnifiedGraphBuilder:
                 )
                 self.nodes[func_id] = func_node
                 self.graph.add_node(func_id, **func_node.to_dict())
-            
+
             # API çağrı düğümü
             call_node = GraphNode(
                 id=node_id,
@@ -193,7 +193,7 @@ class UnifiedGraphBuilder:
             )
             self.nodes[node_id] = call_node
             self.graph.add_node(node_id, **call_node.to_dict())
-            
+
             # Fonksiyon -> API çağrı kenarı
             edge = GraphEdge(
                 source=func_id,
@@ -202,17 +202,17 @@ class UnifiedGraphBuilder:
             )
             self.edges.append(edge)
             self.graph.add_edge(func_id, node_id, type=edge.type.value)
-        
+
         # API endpoint'lerini ekle
         for endpoint in self.parser.api_endpoints:
             node_id = self._generate_node_id(endpoint, "endpoint")
-            
+
             # Handler fonksiyon düğümü
             handler_id = self._generate_node_id(
                 type('obj', (object,), {'file_path': endpoint.file_path, 'name': endpoint.handler_function}),
                 "handler"
             )
-            
+
             if handler_id not in self.nodes:
                 handler_node = GraphNode(
                     id=handler_id,
@@ -228,7 +228,7 @@ class UnifiedGraphBuilder:
                 )
                 self.nodes[handler_id] = handler_node
                 self.graph.add_node(handler_id, **handler_node.to_dict())
-            
+
             # Endpoint düğümü
             endpoint_node = GraphNode(
                 id=node_id,
@@ -246,7 +246,7 @@ class UnifiedGraphBuilder:
             )
             self.nodes[node_id] = endpoint_node
             self.graph.add_node(node_id, **endpoint_node.to_dict())
-            
+
             # Handler -> Endpoint kenarı
             edge = GraphEdge(
                 source=handler_id,
@@ -255,14 +255,14 @@ class UnifiedGraphBuilder:
             )
             self.edges.append(edge)
             self.graph.add_edge(handler_id, node_id, type=edge.type.value)
-            
+
             # Handler'ın endpoint listesine ekle
             self.nodes[handler_id].metadata.setdefault('endpoints', []).append(endpoint.path)
-        
+
         # SQL referanslarını ekle
         for ref in self.parser.table_refs:
             node_id = self._generate_node_id(ref, "sql_ref")
-            
+
             sql_node = GraphNode(
                 id=node_id,
                 type=NodeType.SQL_REFERENCE,
@@ -278,11 +278,11 @@ class UnifiedGraphBuilder:
             )
             self.nodes[node_id] = sql_node
             self.graph.add_node(node_id, **sql_node.to_dict())
-        
+
         # Şema tablolarını ekle
         for table_name, table in self.parser.schema_tables.items():
             node_id = self._generate_node_id(table, "table")
-            
+
             table_node = GraphNode(
                 id=node_id,
                 type=NodeType.DATABASE_TABLE,
@@ -298,19 +298,19 @@ class UnifiedGraphBuilder:
             )
             self.nodes[node_id] = table_node
             self.graph.add_node(node_id, **table_node.to_dict())
-        
+
         # Bağlantıları kur
         self._build_cross_layer_edges()
-    
+
     def _build_cross_layer_edges(self):
         """Katmanlar arası bağlantıları oluştur"""
         connections = self.parser.build_connections()
-        
+
         for source_obj, conn_type, target_obj in connections:
             # Kaynak ve hedef düğüm ID'lerini bul
             source_id = self._find_node_id_for_object(source_obj)
             target_id = self._find_node_id_for_object(target_obj)
-            
+
             if source_id and target_id:
                 edge = GraphEdge(
                     source=source_id,
@@ -319,12 +319,12 @@ class UnifiedGraphBuilder:
                 )
                 self.edges.append(edge)
                 self.graph.add_edge(source_id, target_id, type=conn_type.value)
-    
+
     def _find_node_id_for_object(self, obj: Any) -> Optional[str]:
         """Nesneye karşılık gelen düğüm ID'sini bul"""
         for node_id, node in self.nodes.items():
             if isinstance(obj, APICall):
-                if (node.type == NodeType.API_CALL and 
+                if (node.type == NodeType.API_CALL and
                     node.metadata.get('endpoint') == obj.endpoint and
                     node.file_path == obj.file_path):
                     return node_id
@@ -342,9 +342,9 @@ class UnifiedGraphBuilder:
                 if (node.type == NodeType.DATABASE_TABLE and
                     node.label == obj.table_name):
                     return node_id
-        
+
         return None
-    
+
     def extract_subgraph(
         self,
         query: str,
@@ -353,40 +353,40 @@ class UnifiedGraphBuilder:
     ) -> nx.MultiDiGraph:
         """
         Sorguyla ilgili alt grafı çıkarır.
-        
+
         Args:
             query: Kullanıcı sorgusu (örn: "Kullanıcı profil resmi güncellerken hata")
             max_depth: BFS arama derinliği
             max_nodes: Maksimum düğüm sayısı
-            
+
         Returns:
             Filtrelenmiş alt graf
         """
         # Sorgudan anahtar kelimeleri çıkar
         keywords = self._extract_keywords(query)
-        
+
         # İlgili düğümleri bul
         seed_nodes = self._find_seed_nodes(keywords)
-        
+
         if not seed_nodes:
             # Eşleşme yoksa boş graf döndür
             return nx.MultiDiGraph()
-        
+
         # BFS ile komşuları genişlet
         subgraph_nodes = set()
         for seed in seed_nodes:
             neighbors = self._bfs_expand(seed, max_depth, max_nodes // len(seed_nodes))
             subgraph_nodes.update(neighbors)
-        
+
         # Alt grafı oluştur
         subgraph = self.graph.subgraph(subgraph_nodes).copy()
-        
+
         return subgraph
-    
+
     def _extract_keywords(self, query: str) -> List[str]:
         """Sorgudan anahtar kelimeleri çıkar"""
         import re
-        
+
         # Türkçe ve İngilizce yaygın durdurma kelimeleri
         stop_words = {
             'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
@@ -408,28 +408,28 @@ class UnifiedGraphBuilder:
             'ile', 've', 'veya', 'ama', 'fakat', 'ancak', 'ki', 'de', 'da',
             'mı', 'mi', 'mu', 'mü', 'için', 'gibi', 'kadar', 'üzere',
         }
-        
+
         # Kelimeleri ayır ve normalize et
         words = re.findall(r'\b\w+\b', query.lower())
-        
+
         # Durdurma kelimelerini filtrele ve benzersiz yap
         keywords = list(set(w for w in words if w not in stop_words and len(w) > 2))
-        
+
         return keywords
-    
+
     def _find_seed_nodes(self, keywords: List[str]) -> List[str]:
         """Anahtar kelimelerle eşleşen başlangıç düğümlerini bul"""
         seed_nodes = []
-        
+
         for node_id, node in self.nodes.items():
             score = 0
-            
+
             # Label'da ara
             label_lower = node.label.lower()
             for keyword in keywords:
                 if keyword in label_lower:
                     score += 3
-            
+
             # Metadata'da ara
             for key, value in node.metadata.items():
                 if isinstance(value, str):
@@ -439,20 +439,20 @@ class UnifiedGraphBuilder:
                     for item in value:
                         if isinstance(item, str) and keyword in item.lower():
                             score += 1
-            
+
             # Dosya yolunda ara
             if any(keyword in node.file_path.lower() for keyword in keywords):
                 score += 1
-            
+
             if score > 0:
                 seed_nodes.append((node_id, score))
-        
+
         # Skorlara göre sırala ve en yüksek skorlu düğümleri döndür
         seed_nodes.sort(key=lambda x: x[1], reverse=True)
-        
+
         # En iyi 5 düğümü döndür
         return [node_id for node_id, _ in seed_nodes[:5]]
-    
+
     def _bfs_expand(
         self,
         start_node: str,
@@ -462,27 +462,27 @@ class UnifiedGraphBuilder:
         """BFS ile komşu düğümleri genişlet"""
         visited = {start_node}
         queue = [(start_node, 0)]
-        
+
         while queue and len(visited) < max_nodes:
             current, depth = queue.pop(0)
-            
+
             if depth >= max_depth:
                 continue
-            
+
             # Komşuları ziyaret et
             for neighbor in self.graph.neighbors(current):
                 if neighbor not in visited:
                     visited.add(neighbor)
                     queue.append((neighbor, depth + 1))
-            
+
             # Gelen kenarları da takip et (reverse direction)
             for predecessor in self.graph.predecessors(current):
                 if predecessor not in visited:
                     visited.add(predecessor)
                     queue.append((predecessor, depth + 1))
-        
+
         return visited
-    
+
     def to_llm_context(
         self,
         subgraph: Optional[nx.MultiDiGraph] = None,
@@ -490,40 +490,40 @@ class UnifiedGraphBuilder:
     ) -> str:
         """
         Grafı LLM için optimize edilmiş bağlama dönüştürür.
-        
+
         Args:
             subgraph: Filtrelenmiş alt graf (None ise tam graf)
             format: Çıktı formatı ("markdown", "json", "text")
-            
+
         Returns:
             LLM'e gönderilecek metin bağlamı
         """
         if subgraph is None:
             subgraph = self.graph
-        
+
         if format == "json":
             return self._to_json_context(subgraph)
         elif format == "markdown":
             return self._to_markdown_context(subgraph)
         else:
             return self._to_text_context(subgraph)
-    
+
     def _to_json_context(self, subgraph: nx.MultiDiGraph) -> str:
         """JSON formatında bağlam"""
         nodes = []
         edges = []
-        
+
         for node_id in subgraph.nodes():
             node_data = subgraph.nodes[node_id]
             nodes.append(node_data)
-        
+
         for u, v, key, data in subgraph.edges(keys=True, data=True):
             edges.append({
                 'source': u,
                 'target': v,
                 'type': data.get('type', 'unknown'),
             })
-        
+
         context = {
             'nodes': nodes,
             'edges': edges,
@@ -533,20 +533,20 @@ class UnifiedGraphBuilder:
                 'layers': list(set(n.get('layer', 'unknown') for n in nodes)),
             }
         }
-        
+
         return json.dumps(context, indent=2, ensure_ascii=False)
-    
+
     def _to_markdown_context(self, subgraph: nx.MultiDiGraph) -> str:
         """Markdown formatında bağlam"""
         lines = ["# Full-Stack Knowledge Graph Context\n"]
-        
+
         # Özet
         nodes_list = list(subgraph.nodes(data=True))
         edges_list = list(subgraph.edges(data=True))
-        
+
         lines.append(f"**Toplam Düğümler:** {len(nodes_list)}")
         lines.append(f"**Toplam Bağlantılar:** {len(edges_list)}\n")
-        
+
         # Katmanlara göre grupla
         layers = {}
         for node_id, data in nodes_list:
@@ -554,58 +554,58 @@ class UnifiedGraphBuilder:
             if layer not in layers:
                 layers[layer] = []
             layers[layer].append((node_id, data))
-        
+
         for layer, nodes in layers.items():
             lines.append(f"\n## {layer.upper()} Layer\n")
-            
+
             for node_id, data in nodes:
                 lines.append(f"### {data.get('label', 'Unknown')}")
                 lines.append(f"- **ID:** `{node_id}`")
                 lines.append(f"- **Dosya:** `{data.get('file_path', 'N/A')}`")
                 lines.append(f"- **Satır:** {data.get('line_number', 'N/A')}")
-                
+
                 if data.get('metadata'):
                     lines.append("- **Metadata:**")
                     for key, value in data['metadata'].items():
                         if isinstance(value, (dict, list)):
                             value = json.dumps(value, ensure_ascii=False)
                         lines.append(f"  - `{key}`: {value}")
-                
+
                 lines.append("")
-        
+
         # Bağlantılar
         lines.append("\n## Connections\n")
         for u, v, data in edges_list:
             u_label = subgraph.nodes[u].get('label', u)
             v_label = subgraph.nodes[v].get('label', v)
             conn_type = data.get('type', 'unknown')
-            
+
             lines.append(f"- `{u_label}` --[{conn_type}]--> `{v_label}`")
-        
+
         return "\n".join(lines)
-    
+
     def _to_text_context(self, subgraph: nx.MultiDiGraph) -> str:
         """Düz metin formatında bağlam"""
         lines = ["FULL-STACK KNOWLEDGE GRAPH CONTEXT", "=" * 40]
-        
+
         for node_id, data in subgraph.nodes(data=True):
             layer = data.get('layer', 'unknown').upper()
             label = data.get('label', 'Unknown')
             file_path = data.get('file_path', 'N/A')
-            
+
             lines.append(f"\n[{layer}] {label}")
             lines.append(f"  File: {file_path}")
-        
+
         lines.append("\nCONNECTIONS:")
         for u, v, data in subgraph.edges(data=True):
             u_label = subgraph.nodes[u].get('label', u)
             v_label = subgraph.nodes[v].get('label', v)
             conn_type = data.get('type', 'unknown')
-            
+
             lines.append(f"  {u_label} -> {conn_type} -> {v_label}")
-        
+
         return "\n".join(lines)
-    
+
     def get_summary(self) -> Dict[str, Any]:
         """Graf özetini döndür"""
         return {
@@ -618,11 +618,11 @@ class UnifiedGraphBuilder:
             'database_tables': sum(1 for n in self.nodes.values() if n.type == NodeType.DATABASE_TABLE),
             'parser_summary': self.parser.get_summary(),
         }
-    
+
     def export(self, output_path: str, format: str = "graphml"):
         """
         Grafı dosyaya dışa aktar.
-        
+
         Args:
             output_path: Çıktı dosya yolu
             format: Format türü ("graphml", "gexf", "json")

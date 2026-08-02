@@ -21,7 +21,7 @@ except ImportError:
 def load_graph(graph_path: str):
     """GraphML veya JSON graf dosyasını yükle."""
     import networkx as nx
-    
+
     if graph_path.endswith('.graphml'):
         return nx.read_graphml(graph_path)
     elif graph_path.endswith('.json'):
@@ -34,7 +34,7 @@ def load_graph(graph_path: str):
 
 def diagnose_error_log(log_path: str, graph_path: str, output_path: Optional[str] = None):
     """Hata logunu analiz et ve düzeltme talimatları üret."""
-    
+
     # Grafı yükle
     print(f"📊 Graf yükleniyor: {graph_path}")
     try:
@@ -43,7 +43,7 @@ def diagnose_error_log(log_path: str, graph_path: str, output_path: Optional[str
     except Exception as e:
         print(f"❌ Graf yüklenemedi: {e}")
         return 1
-    
+
     # Hata logunu oku
     print(f"📋 Hata logu okunuyor: {log_path}")
     try:
@@ -52,26 +52,26 @@ def diagnose_error_log(log_path: str, graph_path: str, output_path: Optional[str
     except Exception as e:
         print(f"❌ Hata logu okunamadı: {e}")
         return 1
-    
+
     # 1. Smart Error Matcher ile hataları eşleştir
     print("🔍 Hatalar analiz ediliyor...")
     error_matcher = SmartErrorMatcher(graph)
     errors = error_matcher.parse_log(log_content)
-    
+
     # 2. Broken Chain Detector ile zincir kopukluklarını bul
     print("🔗 Bağımlılık zincirleri kontrol ediliyor...")
     chain_detector = BrokenChainDetector(graph)
     broken_chains = chain_detector.detect_all()
-    
+
     # 3. Config Validator ile yapılandırma sorunlarını bul
     print("⚙️  Yapılandırma doğrulanıyor...")
     config_validator = ConfigValidator(graph)
     config_issues = config_validator.validate_all()
-    
+
     # Rapor oluştur
     report = "# 🚑 Android Hata Teşhis Raporu\n\n"
     report += "Bu rapor, AI asistanına verilerek hızlı düzeltme yapılabilir.\n\n"
-    
+
     # Bölüm 1: Derleme Hataları
     if errors:
         report += "## 1️⃣ Derleme Hataları\n\n"
@@ -79,7 +79,7 @@ def diagnose_error_log(log_path: str, graph_path: str, output_path: Optional[str
         report += "\n\n"
     else:
         report += "## 1️⃣ Derleme Hataları\n\n✅ Derleme hatası bulunamadı.\n\n"
-    
+
     # Bölüm 2: Kırık Zincirler
     if broken_chains:
         report += "## 2️⃣ Kırık Zincirler\n\n"
@@ -87,7 +87,7 @@ def diagnose_error_log(log_path: str, graph_path: str, output_path: Optional[str
         report += "\n\n"
     else:
         report += "## 2️⃣ Kırık Zincirler\n\n✅ Kırık zincir tespit edilmedi.\n\n"
-    
+
     # Bölüm 3: Yapılandırma Sorunları
     if config_issues:
         report += "## 3️⃣ Yapılandırma Sorunları\n\n"
@@ -95,14 +95,14 @@ def diagnose_error_log(log_path: str, graph_path: str, output_path: Optional[str
         report += "\n\n"
     else:
         report += "## 3️⃣ Yapılandırma Sorunları\n\n✅ Yapılandırma sorunu bulunamadı.\n\n"
-    
+
     # Özet
     report += "---\n\n"
     report += "## 📊 Özet\n\n"
     report += f"- **Derleme Hataları:** {len(errors)}\n"
     report += f"- **Kırık Zincirler:** {len(broken_chains)}\n"
     report += f"- **Yapılandırma Sorunları:** {len(config_issues)}\n\n"
-    
+
     total_issues = len(errors) + len(broken_chains) + len(config_issues)
     if total_issues == 0:
         report += "🎉 Proje sağlıklı görünüyor!\n"
@@ -112,7 +112,7 @@ def diagnose_error_log(log_path: str, graph_path: str, output_path: Optional[str
         report += "1. 🔴 Derleme hataları (build başarısız)\n"
         report += "2. 🔴 Kritik zincir kopuklukları (runtime crash)\n"
         report += "3. ⚠️ Yapılandırma uyarıları (güvenlik/performans)\n"
-    
+
     # Çıktıyı yaz veya stdout'a bas
     if output_path:
         with open(output_path, 'w', encoding='utf-8') as f:
@@ -121,7 +121,7 @@ def diagnose_error_log(log_path: str, graph_path: str, output_path: Optional[str
     else:
         print("\n" + "="*60)
         print(report)
-    
+
     return 0
 
 def main():
@@ -141,18 +141,18 @@ def main():
         "--output", "-o",
         help="Çıktı dosyası (varsayılan: stdout)"
     )
-    
+
     args = parser.parse_args()
-    
+
     if not os.path.exists(args.log_file):
         print(f"❌ Hata logu bulunamadı: {args.log_file}")
         sys.exit(1)
-    
+
     if not os.path.exists(args.graph):
         print(f"❌ Graf dosyası bulunamadı: {args.graph}")
         print("💡 Önce 'graphify scan .' komutuyla projeyi tarayın.")
         sys.exit(1)
-    
+
     exit_code = diagnose_error_log(args.log_file, args.graph, args.output)
     sys.exit(exit_code)
 

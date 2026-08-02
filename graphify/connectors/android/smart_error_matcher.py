@@ -37,12 +37,12 @@ class SmartErrorMatcher:
     def parse_log(self, log_content: str) -> List[ErrorMatch]:
         matches = []
         lines = log_content.split('\n')
-        
+
         for i, line in enumerate(lines):
             match = self._analyze_line(line, i, lines)
             if match:
                 matches.append(match)
-        
+
         return matches
 
     def _analyze_line(self, line: str, line_idx: int, all_lines: List[str]) -> Optional[ErrorMatch]:
@@ -114,7 +114,7 @@ class SmartErrorMatcher:
                 confidence=0.95,
                 suggestion="Metod imzasını veya üst sınıfın versiyonunu kontrol edin."
             )
-            
+
         # 5. SDK Version Mismatch
         m = self.patterns['sdk_version'].search(line)
         if m:
@@ -160,7 +160,7 @@ class SmartErrorMatcher:
     def generate_fix_prompt(self, errors: List[ErrorMatch]) -> str:
         if not errors:
             return "Hata bulunamadı."
-        
+
         prompt = "## Tespit Edilen Hatalar ve Çözüm Önerileri\n\n"
         for i, err in enumerate(errors, 1):
             prompt += f"### {i}. {err.error_type}\n"
@@ -169,6 +169,6 @@ class SmartErrorMatcher:
                 prompt += f"- **Satır:** {err.line_number}\n"
             prompt += f"- **Sorun:** {err.message}\n"
             prompt += f"- **Çözüm:** {err.suggestion}\n\n"
-        
+
         prompt += "**AI Talimatı:** Yukarıdaki hataları sırasıyla düzelt. Sadece belirtilen dosyaları düzenle."
         return prompt

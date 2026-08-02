@@ -5,7 +5,7 @@ Bu paket, Graphify'i cok katmanli full-stack projeleri tarayabilir hale getirir.
 
 Available connectors:
 - GraphQL Parser
-- gRPC Parser  
+- gRPC Parser
 - Message Queue Parser (Kafka, RabbitMQ)
 - Cloud Resource Mapper (AWS, GCP, Azure)
 - WebSocket Tracker
@@ -133,7 +133,7 @@ __all__ = [
     # Microservices
     'parse_microservices',
     'MicroserviceTracer',
-    
+
     # Android-Specific Connectors
     'UIMapper',
     'DataFlowTracker',
@@ -141,7 +141,7 @@ __all__ = [
     'ManifestAnalyzer',
     'TermuxOptimizer',
     'enable_termux_mode',
-    
+
     # Build & Test Analysis
     'GradleBuildErrorAnalyzer',
     'BuildError',
@@ -175,55 +175,55 @@ def parse_fullstack_project(
 ) -> dict:
     """
     Parse a full-stack project with all available connectors.
-    
+
     Returns a dictionary of graphs by type.
     """
     import networkx as nx
-    
+
     graphs = {}
-    
+
     if enable_all or enable_graphql:
         try:
             graphs['graphql'] = parse_graphql_project(directory)
         except Exception as e:
             graphs['graphql_error'] = str(e)
-            
+
     if enable_all or enable_grpc:
         try:
             graphs['grpc'] = parse_grpc_project(directory)
         except Exception as e:
             graphs['grpc_error'] = str(e)
-            
+
     if enable_all or enable_mq:
         try:
             graphs['message_queue'] = parse_mq_project(directory)
         except Exception as e:
             graphs['mq_error'] = str(e)
-            
+
     if enable_all or enable_cloud:
         try:
             graphs['cloud'] = parse_cloud_resources(directory)
         except Exception as e:
             graphs['cloud_error'] = str(e)
-            
+
     if enable_all or enable_websocket:
         try:
             graphs['websocket'] = parse_websocket_project(directory)
         except Exception as e:
             graphs['websocket_error'] = str(e)
-            
+
     if enable_all or enable_auth:
         try:
             graphs['auth'] = parse_auth_flows(directory)
         except Exception as e:
             graphs['auth_error'] = str(e)
-            
+
     if enable_all or enable_microservices:
         try:
             graphs['microservices'] = parse_microservices(directory)
         except Exception as e:
             graphs['microservices_error'] = str(e)
-            
+
     if enable_all or enable_cross_layer:
         try:
             parser = CrossLayerParser()
@@ -233,27 +233,27 @@ def parse_fullstack_project(
             graphs['cross_layer'] = builder.graph
         except Exception as e:
             graphs['cross_layer_error'] = str(e)
-            
+
     return graphs
 
 
 def merge_graphs(graphs: dict) -> 'nx.Graph':
     """Merge multiple graphs into a single unified graph."""
     import networkx as nx
-    
+
     merged = nx.Graph()
-    
+
     for graph_type, graph in graphs.items():
         if isinstance(graph, nx.Graph):
             for node, attrs in graph.nodes(data=True):
                 attrs['source_graph'] = graph_type
                 merged.add_node(f"{graph_type}:{node}", **attrs)
-                
+
             for source, target, attrs in graph.edges(data=True):
                 merged.add_edge(
                     f"{graph_type}:{source}",
                     f"{graph_type}:{target}",
                     **attrs
                 )
-                
+
     return merged
