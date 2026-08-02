@@ -1,0 +1,631 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d7" for="edge" attr.name="type" attr.type="string"/>
+<key id="d6" for="node" attr.name="metadata" attr.type="string"/>
+<key id="d5" for="node" attr.name="line_number" attr.type="long"/>
+<key id="d4" for="node" attr.name="file_path" attr.type="string"/>
+<key id="d3" for="node" attr.name="label" attr.type="string"/>
+<key id="d2" for="node" attr.name="layer" attr.type="string"/>
+<key id="d1" for="node" attr.name="type" attr.type="string"/>
+<key id="d0" for="node" attr.name="id" attr.type="string"/>
+<graph edgedefault="directed"><node id="func_94634f33">
+  <data key="d0">func_94634f33</data>
+  <data key="d1">frontend_function</data>
+  <data key="d2">frontend</data>
+  <data key="d3">getUserProfile</data>
+  <data key="d4">frontend/userService.ts</data>
+  <data key="d5">18</data>
+  <data key="d6">{"calls": [":param/users/:param"]}</data>
+</node>
+<node id="api_call_7b71be49">
+  <data key="d0">api_call_7b71be49</data>
+  <data key="d1">api_call</data>
+  <data key="d2">frontend</data>
+  <data key="d3">GET :param/users/:param</data>
+  <data key="d4">frontend/userService.ts</data>
+  <data key="d5">18</data>
+  <data key="d6">{"method": "GET", "endpoint": ":param/users/:param", "function": "getUserProfile"}</data>
+</node>
+<node id="func_1501689e">
+  <data key="d0">func_1501689e</data>
+  <data key="d1">frontend_function</data>
+  <data key="d2">frontend</data>
+  <data key="d3">updateUserProfile</data>
+  <data key="d4">frontend/userService.ts</data>
+  <data key="d5">29</data>
+  <data key="d6">{"calls": [":param/users/:param"]}</data>
+</node>
+<node id="api_call_9092d2cf">
+  <data key="d0">api_call_9092d2cf</data>
+  <data key="d1">api_call</data>
+  <data key="d2">frontend</data>
+  <data key="d3">PUT :param/users/:param</data>
+  <data key="d4">frontend/userService.ts</data>
+  <data key="d5">29</data>
+  <data key="d6">{"method": "PUT", "endpoint": ":param/users/:param", "function": "updateUserProfile"}</data>
+</node>
+<node id="func_02415371">
+  <data key="d0">func_02415371</data>
+  <data key="d1">frontend_function</data>
+  <data key="d2">frontend</data>
+  <data key="d3">deleteUser</data>
+  <data key="d4">frontend/userService.ts</data>
+  <data key="d5">55</data>
+  <data key="d6">{"calls": [":param/users/:param"]}</data>
+</node>
+<node id="api_call_3c7b0a17">
+  <data key="d0">api_call_3c7b0a17</data>
+  <data key="d1">api_call</data>
+  <data key="d2">frontend</data>
+  <data key="d3">DELETE :param/users/:param</data>
+  <data key="d4">frontend/userService.ts</data>
+  <data key="d5">55</data>
+  <data key="d6">{"method": "DELETE", "endpoint": ":param/users/:param", "function": "deleteUser"}</data>
+</node>
+<node id="func_6e9a91f1">
+  <data key="d0">func_6e9a91f1</data>
+  <data key="d1">frontend_function</data>
+  <data key="d2">frontend</data>
+  <data key="d3">listUsers</data>
+  <data key="d4">frontend/userService.ts</data>
+  <data key="d5">62</data>
+  <data key="d6">{"calls": [":param/users"]}</data>
+</node>
+<node id="api_call_3b9fe74f">
+  <data key="d0">api_call_3b9fe74f</data>
+  <data key="d1">api_call</data>
+  <data key="d2">frontend</data>
+  <data key="d3">GET :param/users</data>
+  <data key="d4">frontend/userService.ts</data>
+  <data key="d5">62</data>
+  <data key="d6">{"method": "GET", "endpoint": ":param/users", "function": "listUsers"}</data>
+</node>
+<node id="handler_c6ec65a2">
+  <data key="d0">handler_c6ec65a2</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">list_users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">45</data>
+  <data key="d6">{"framework": "fastapi", "endpoints": ["/api/v1/users"]}</data>
+</node>
+<node id="endpoint_42f6e7ff">
+  <data key="d0">endpoint_42f6e7ff</data>
+  <data key="d1">api_endpoint</data>
+  <data key="d2">backend</data>
+  <data key="d3">GET /api/v1/users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">45</data>
+  <data key="d6">{"method": "GET", "path": "/api/v1/users", "framework": "gin", "handler": "list_users"}</data>
+</node>
+<node id="handler_660c464e">
+  <data key="d0">handler_660c464e</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">list_users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">45</data>
+  <data key="d6">{"framework": "express", "endpoints": ["/api/v1/users"]}</data>
+</node>
+<node id="handler_918faec3">
+  <data key="d0">handler_918faec3</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">list_users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">45</data>
+  <data key="d6">{"framework": "gin", "endpoints": ["/api/v1/users"]}</data>
+</node>
+<node id="handler_1adc231a">
+  <data key="d0">handler_1adc231a</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">get_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">65</data>
+  <data key="d6">{"framework": "fastapi", "endpoints": ["/api/v1/users/{user_id}"]}</data>
+</node>
+<node id="endpoint_a7773ad3">
+  <data key="d0">endpoint_a7773ad3</data>
+  <data key="d1">api_endpoint</data>
+  <data key="d2">backend</data>
+  <data key="d3">GET /api/v1/users/{user_id}</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">65</data>
+  <data key="d6">{"method": "GET", "path": "/api/v1/users/{user_id}", "framework": "gin", "handler": "get_user"}</data>
+</node>
+<node id="handler_2fc87601">
+  <data key="d0">handler_2fc87601</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">get_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">65</data>
+  <data key="d6">{"framework": "express", "endpoints": ["/api/v1/users/{user_id}"]}</data>
+</node>
+<node id="handler_33bc9e9d">
+  <data key="d0">handler_33bc9e9d</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">get_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">65</data>
+  <data key="d6">{"framework": "gin", "endpoints": ["/api/v1/users/{user_id}"]}</data>
+</node>
+<node id="handler_7d534bb4">
+  <data key="d0">handler_7d534bb4</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">update_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">88</data>
+  <data key="d6">{"framework": "fastapi", "endpoints": ["/api/v1/users/{user_id}"]}</data>
+</node>
+<node id="endpoint_10a47523">
+  <data key="d0">endpoint_10a47523</data>
+  <data key="d1">api_endpoint</data>
+  <data key="d2">backend</data>
+  <data key="d3">PUT /api/v1/users/{user_id}</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">88</data>
+  <data key="d6">{"method": "PUT", "path": "/api/v1/users/{user_id}", "framework": "gin", "handler": "update_user"}</data>
+</node>
+<node id="handler_d0f15520">
+  <data key="d0">handler_d0f15520</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">update_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">88</data>
+  <data key="d6">{"framework": "express", "endpoints": ["/api/v1/users/{user_id}"]}</data>
+</node>
+<node id="handler_a2d2e300">
+  <data key="d0">handler_a2d2e300</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">update_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">88</data>
+  <data key="d6">{"framework": "gin", "endpoints": ["/api/v1/users/{user_id}"]}</data>
+</node>
+<node id="handler_39856dc9">
+  <data key="d0">handler_39856dc9</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">upload_avatar</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">144</data>
+  <data key="d6">{"framework": "fastapi", "endpoints": ["/api/v1/users/{user_id}/avatar"]}</data>
+</node>
+<node id="endpoint_d6b451cc">
+  <data key="d0">endpoint_d6b451cc</data>
+  <data key="d1">api_endpoint</data>
+  <data key="d2">backend</data>
+  <data key="d3">POST /api/v1/users/{user_id}/avatar</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">144</data>
+  <data key="d6">{"method": "POST", "path": "/api/v1/users/{user_id}/avatar", "framework": "gin", "handler": "upload_avatar"}</data>
+</node>
+<node id="handler_85c913d9">
+  <data key="d0">handler_85c913d9</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">upload_avatar</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">144</data>
+  <data key="d6">{"framework": "express", "endpoints": ["/api/v1/users/{user_id}/avatar"]}</data>
+</node>
+<node id="handler_35a3b78c">
+  <data key="d0">handler_35a3b78c</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">upload_avatar</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">144</data>
+  <data key="d6">{"framework": "gin", "endpoints": ["/api/v1/users/{user_id}/avatar"]}</data>
+</node>
+<node id="handler_c629ae67">
+  <data key="d0">handler_c629ae67</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">delete_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">168</data>
+  <data key="d6">{"framework": "fastapi", "endpoints": ["/api/v1/users/{user_id}"]}</data>
+</node>
+<node id="endpoint_4d9a8d9f">
+  <data key="d0">endpoint_4d9a8d9f</data>
+  <data key="d1">api_endpoint</data>
+  <data key="d2">backend</data>
+  <data key="d3">DELETE /api/v1/users/{user_id}</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">168</data>
+  <data key="d6">{"method": "DELETE", "path": "/api/v1/users/{user_id}", "framework": "gin", "handler": "delete_user"}</data>
+</node>
+<node id="handler_87f4f376">
+  <data key="d0">handler_87f4f376</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">delete_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">168</data>
+  <data key="d6">{"framework": "express", "endpoints": ["/api/v1/users/{user_id}"]}</data>
+</node>
+<node id="handler_56c4ca0a">
+  <data key="d0">handler_56c4ca0a</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">delete_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">168</data>
+  <data key="d6">{"framework": "gin", "endpoints": ["/api/v1/users/{user_id}"]}</data>
+</node>
+<node id="handler_0fc634bd">
+  <data key="d0">handler_0fc634bd</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">create_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">185</data>
+  <data key="d6">{"framework": "fastapi", "endpoints": ["/api/v1/users"]}</data>
+</node>
+<node id="endpoint_2f5d1a30">
+  <data key="d0">endpoint_2f5d1a30</data>
+  <data key="d1">api_endpoint</data>
+  <data key="d2">backend</data>
+  <data key="d3">POST /api/v1/users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">185</data>
+  <data key="d6">{"method": "POST", "path": "/api/v1/users", "framework": "gin", "handler": "create_user"}</data>
+</node>
+<node id="handler_3da64efb">
+  <data key="d0">handler_3da64efb</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">create_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">185</data>
+  <data key="d6">{"framework": "express", "endpoints": ["/api/v1/users"]}</data>
+</node>
+<node id="handler_a31e1216">
+  <data key="d0">handler_a31e1216</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">create_user</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">185</data>
+  <data key="d6">{"framework": "gin", "endpoints": ["/api/v1/users"]}</data>
+</node>
+<node id="handler_b06855bc">
+  <data key="d0">handler_b06855bc</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">get_user_orders</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">218</data>
+  <data key="d6">{"framework": "fastapi", "endpoints": ["/api/v1/users/{user_id}/orders"]}</data>
+</node>
+<node id="endpoint_94b6d91f">
+  <data key="d0">endpoint_94b6d91f</data>
+  <data key="d1">api_endpoint</data>
+  <data key="d2">backend</data>
+  <data key="d3">GET /api/v1/users/{user_id}/orders</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">218</data>
+  <data key="d6">{"method": "GET", "path": "/api/v1/users/{user_id}/orders", "framework": "gin", "handler": "get_user_orders"}</data>
+</node>
+<node id="handler_f95a62fb">
+  <data key="d0">handler_f95a62fb</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">get_user_orders</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">218</data>
+  <data key="d6">{"framework": "express", "endpoints": ["/api/v1/users/{user_id}/orders"]}</data>
+</node>
+<node id="handler_a3ac3107">
+  <data key="d0">handler_a3ac3107</data>
+  <data key="d1">backend_handler</data>
+  <data key="d2">backend</data>
+  <data key="d3">get_user_orders</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">218</data>
+  <data key="d6">{"framework": "gin", "endpoints": ["/api/v1/users/{user_id}/orders"]}</data>
+</node>
+<node id="sql_ref_8c20bf25">
+  <data key="d0">sql_ref_8c20bf25</data>
+  <data key="d1">sql_reference</data>
+  <data key="d2">database</data>
+  <data key="d3">SELECT users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">51</data>
+  <data key="d6">{"table": "users", "operation": "SELECT", "function": "list_users"}</data>
+</node>
+<node id="sql_ref_c272049d">
+  <data key="d0">sql_ref_c272049d</data>
+  <data key="d1">sql_reference</data>
+  <data key="d2">database</data>
+  <data key="d3">SELECT users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">72</data>
+  <data key="d6">{"table": "users", "operation": "SELECT", "function": "get_user"}</data>
+</node>
+<node id="sql_ref_b78275b6">
+  <data key="d0">sql_ref_b78275b6</data>
+  <data key="d1">sql_reference</data>
+  <data key="d2">database</data>
+  <data key="d3">UPDATE users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">122</data>
+  <data key="d6">{"table": "users", "operation": "UPDATE", "function": "update_user"}</data>
+</node>
+<node id="sql_ref_25b8a6fc">
+  <data key="d0">sql_ref_25b8a6fc</data>
+  <data key="d1">sql_reference</data>
+  <data key="d2">database</data>
+  <data key="d3">SELECT users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">128</data>
+  <data key="d6">{"table": "users", "operation": "SELECT", "function": "update_user"}</data>
+</node>
+<node id="sql_ref_c96906af">
+  <data key="d0">sql_ref_c96906af</data>
+  <data key="d1">sql_reference</data>
+  <data key="d2">database</data>
+  <data key="d3">UPDATE users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">160</data>
+  <data key="d6">{"table": "users", "operation": "UPDATE", "function": "upload_avatar"}</data>
+</node>
+<node id="sql_ref_a789e800">
+  <data key="d0">sql_ref_a789e800</data>
+  <data key="d1">sql_reference</data>
+  <data key="d2">database</data>
+  <data key="d3">DELETE users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">176</data>
+  <data key="d6">{"table": "users", "operation": "DELETE", "function": "delete_user"}</data>
+</node>
+<node id="sql_ref_1628e388">
+  <data key="d0">sql_ref_1628e388</data>
+  <data key="d1">sql_reference</data>
+  <data key="d2">database</data>
+  <data key="d3">INSERT users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">196</data>
+  <data key="d6">{"table": "users", "operation": "INSERT", "function": "create_user"}</data>
+</node>
+<node id="sql_ref_efda0ace">
+  <data key="d0">sql_ref_efda0ace</data>
+  <data key="d1">sql_reference</data>
+  <data key="d2">database</data>
+  <data key="d3">JOIN ile</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">223</data>
+  <data key="d6">{"table": "ile", "operation": "JOIN", "function": "get_user_orders"}</data>
+</node>
+<node id="sql_ref_49d7183b">
+  <data key="d0">sql_ref_49d7183b</data>
+  <data key="d1">sql_reference</data>
+  <data key="d2">database</data>
+  <data key="d3">JOIN users</data>
+  <data key="d4">backend/user_api.py</data>
+  <data key="d5">229</data>
+  <data key="d6">{"table": "users", "operation": "JOIN", "function": "get_user_orders"}</data>
+</node>
+<node id="table_73b39f91">
+  <data key="d0">table_73b39f91</data>
+  <data key="d1">database_table</data>
+  <data key="d2">database</data>
+  <data key="d3">users</data>
+  <data key="d4">database/schema.sql</data>
+  <data key="d5">0</data>
+  <data key="d6">{"columns": {}, "primary_key": null, "foreign_keys": {}}</data>
+</node>
+<node id="table_37cea7b0">
+  <data key="d0">table_37cea7b0</data>
+  <data key="d1">database_table</data>
+  <data key="d2">database</data>
+  <data key="d3">orders</data>
+  <data key="d4">database/schema.sql</data>
+  <data key="d5">0</data>
+  <data key="d6">{"columns": {}, "primary_key": null, "foreign_keys": {"user_id": "users"}}</data>
+</node>
+<node id="table_a9035ce8">
+  <data key="d0">table_a9035ce8</data>
+  <data key="d1">database_table</data>
+  <data key="d2">database</data>
+  <data key="d3">user_sessions</data>
+  <data key="d4">database/schema.sql</data>
+  <data key="d5">0</data>
+  <data key="d6">{"columns": {}, "primary_key": null, "foreign_keys": {"user_id": "users"}}</data>
+</node>
+<node id="table_a40ce2f3">
+  <data key="d0">table_a40ce2f3</data>
+  <data key="d1">database_table</data>
+  <data key="d2">database</data>
+  <data key="d3">audit_log</data>
+  <data key="d4">database/schema.sql</data>
+  <data key="d5">0</data>
+  <data key="d6">{"columns": {}, "primary_key": null, "foreign_keys": {"user_id": "users"}}</data>
+</node>
+<edge source="func_94634f33" target="api_call_7b71be49" id="0">
+  <data key="d7">calls_api</data>
+</edge>
+<edge source="func_1501689e" target="api_call_9092d2cf" id="0">
+  <data key="d7">calls_api</data>
+</edge>
+<edge source="func_02415371" target="api_call_3c7b0a17" id="0">
+  <data key="d7">calls_api</data>
+</edge>
+<edge source="func_6e9a91f1" target="api_call_3b9fe74f" id="0">
+  <data key="d7">calls_api</data>
+</edge>
+<edge source="handler_c6ec65a2" target="endpoint_42f6e7ff" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="endpoint_42f6e7ff" target="sql_ref_8c20bf25" id="0">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_42f6e7ff" target="sql_ref_8c20bf25" id="1">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_42f6e7ff" target="sql_ref_8c20bf25" id="2">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_42f6e7ff" target="sql_ref_8c20bf25" id="3">
+  <data key="d7">inserts_into_table</data>
+</edge>
+<edge source="endpoint_42f6e7ff" target="sql_ref_8c20bf25" id="4">
+  <data key="d7">inserts_into_table</data>
+</edge>
+<edge source="endpoint_42f6e7ff" target="sql_ref_8c20bf25" id="5">
+  <data key="d7">inserts_into_table</data>
+</edge>
+<edge source="handler_660c464e" target="endpoint_42f6e7ff" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_918faec3" target="endpoint_42f6e7ff" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_1adc231a" target="endpoint_a7773ad3" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="0">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="1">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="2">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="3">
+  <data key="d7">updates_table</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="4">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="5">
+  <data key="d7">updates_table</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="6">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="7">
+  <data key="d7">updates_table</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="8">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="9">
+  <data key="d7">deletes_from_table</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="10">
+  <data key="d7">deletes_from_table</data>
+</edge>
+<edge source="endpoint_a7773ad3" target="sql_ref_8c20bf25" id="11">
+  <data key="d7">deletes_from_table</data>
+</edge>
+<edge source="handler_2fc87601" target="endpoint_a7773ad3" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_33bc9e9d" target="endpoint_a7773ad3" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_7d534bb4" target="endpoint_10a47523" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_d0f15520" target="endpoint_10a47523" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_a2d2e300" target="endpoint_10a47523" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_39856dc9" target="endpoint_d6b451cc" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="endpoint_d6b451cc" target="sql_ref_8c20bf25" id="0">
+  <data key="d7">updates_table</data>
+</edge>
+<edge source="endpoint_d6b451cc" target="sql_ref_8c20bf25" id="1">
+  <data key="d7">updates_table</data>
+</edge>
+<edge source="endpoint_d6b451cc" target="sql_ref_8c20bf25" id="2">
+  <data key="d7">updates_table</data>
+</edge>
+<edge source="handler_85c913d9" target="endpoint_d6b451cc" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_35a3b78c" target="endpoint_d6b451cc" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_c629ae67" target="endpoint_4d9a8d9f" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_87f4f376" target="endpoint_4d9a8d9f" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_56c4ca0a" target="endpoint_4d9a8d9f" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_0fc634bd" target="endpoint_2f5d1a30" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_3da64efb" target="endpoint_2f5d1a30" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_a31e1216" target="endpoint_2f5d1a30" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_b06855bc" target="endpoint_94b6d91f" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="endpoint_94b6d91f" target="sql_ref_efda0ace" id="0">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_94b6d91f" target="sql_ref_efda0ace" id="1">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_94b6d91f" target="sql_ref_efda0ace" id="2">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_94b6d91f" target="sql_ref_8c20bf25" id="0">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_94b6d91f" target="sql_ref_8c20bf25" id="1">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="endpoint_94b6d91f" target="sql_ref_8c20bf25" id="2">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="handler_f95a62fb" target="endpoint_94b6d91f" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="handler_a3ac3107" target="endpoint_94b6d91f" id="0">
+  <data key="d7">handles_request</data>
+</edge>
+<edge source="sql_ref_8c20bf25" target="table_73b39f91" id="0">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="sql_ref_8c20bf25" target="table_73b39f91" id="1">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="sql_ref_8c20bf25" target="table_73b39f91" id="2">
+  <data key="d7">updates_table</data>
+</edge>
+<edge source="sql_ref_8c20bf25" target="table_73b39f91" id="3">
+  <data key="d7">queries_table</data>
+</edge>
+<edge source="sql_ref_8c20bf25" target="table_73b39f91" id="4">
+  <data key="d7">updates_table</data>
+</edge>
+<edge source="sql_ref_8c20bf25" target="table_73b39f91" id="5">
+  <data key="d7">deletes_from_table</data>
+</edge>
+<edge source="sql_ref_8c20bf25" target="table_73b39f91" id="6">
+  <data key="d7">inserts_into_table</data>
+</edge>
+<edge source="sql_ref_8c20bf25" target="table_73b39f91" id="7">
+  <data key="d7">queries_table</data>
+</edge>
+</graph></graphml>

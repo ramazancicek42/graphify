@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyApp</string>
+    <string name="welcome_message">Welcome to MyApp!</string>
+    <string name="submit">Submit</string>
+    <string name="profile_image_desc">User profile picture</string>
+    <string name="error_network">Network error occurred</string>
+    <string name="loading">Loading...</string>
+</resources>

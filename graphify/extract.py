@@ -31,6 +31,7 @@ from graphify.extractors.base import (  # noqa: F401
     _make_id,
     _read_text,
 )
+from graphify.extractors.android_xml import extract_android_xml  # noqa: F401
 from graphify.extractors.apex import extract_apex  # noqa: F401
 from graphify.extractors.bash import extract_bash  # noqa: F401
 from graphify.extractors.blade import extract_blade  # noqa: F401
@@ -4181,6 +4182,7 @@ _DISPATCH: dict[str, Any] = {
     ".sv": extract_verilog,
     ".svh": extract_verilog,
     ".sql": extract_sql,
+    ".xml": extract_android_xml,  # Android XML resources (manifest, layouts, values)
     ".md": extract_markdown,
     ".mdx": extract_markdown,
     ".qmd": extract_markdown,
