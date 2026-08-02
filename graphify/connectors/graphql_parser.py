@@ -246,19 +246,31 @@ class GraphQLParser:
             
         # Add edges
         for source, target, attrs in self.edges:
+            # Field edges arrive as "<Type>.<field>" and "implements"/relation edges
+            # as plain type names. Promote missing endpoints so edges are not dropped.
+            if source not in G.nodes and '.' in source:
+                parent, _field = source.rsplit('.', 1)
+                if parent in G.nodes:
+                    G.add_node(source, kind='FIELD', node_type='graphql_field')
+            if target not in G.nodes and '.' in target:
+                parent, _field = target.rsplit('.', 1)
+                if parent in G.nodes:
+                    G.add_node(target, kind='FIELD', node_type='graphql_field')
+
             if source in G.nodes and target in G.nodes:
                 G.add_edge(source, target, **attrs)
-                
-        # Add resolver edges
+
+        # Add resolver edges (code file -> schema field), promoting code file to a node
         for code_path, schema_name in self.resolver_map.items():
             if schema_name in G.nodes:
+                if code_path not in G.nodes:
+                    G.add_node(code_path, node_type='code_to_graphql', kind='RESOLVER')
                 G.add_edge(
                     code_path,
                     schema_name,
-                    edge_type='resolves',
-                    node_type='code_to_graphql'
+                    edge_type='resolves'
                 )
-                
+
         return G
 
 

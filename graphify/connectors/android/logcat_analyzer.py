@@ -77,7 +77,7 @@ class LogcatAnalyzer:
         # Crash başlangıç pattern'i - Android logcat formatı
         # Format: MM-DD HH:MM:SS.mmm PID TID Level Tag: Message
         crash_pattern = re.compile(
-            r'^(\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{3})\s+'
+            r'^(?:\d{4}-)?(\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{3})\s+'
             r'(\d+)\s+(\d+)\s+([A-Z]+)\s+([^:]+):\s+(.*)$',
             re.MULTILINE
         )

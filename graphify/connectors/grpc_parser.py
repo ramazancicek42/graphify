@@ -352,7 +352,17 @@ class gRPCParser:
             
         # Add edges
         for source, target, attrs in self.edges:
-            # For field-type edges, target might not be a node yet
+            # Relation endpoints arrive as "<Parent>.<child>" (e.g. "User.GetUser"
+            # or "Order.user_id"). Promote them so edges are not silently dropped.
+            if source not in G.nodes and '.' in source:
+                parent, _child = source.rsplit('.', 1)
+                if parent in G.nodes:
+                    G.add_node(source, kind='METHOD', node_type='grpc')
+            if target not in G.nodes and '.' in target:
+                parent, _child = target.rsplit('.', 1)
+                if parent in G.nodes:
+                    G.add_node(target, kind='EXTERNAL_TYPE', node_type='grpc')
+
             if source in G.nodes:
                 if target not in G.nodes:
                     # Create placeholder node for external types

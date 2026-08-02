@@ -116,7 +116,9 @@ dev = [
 package = true
 
 [tool.setuptools]
-packages = ["graphify", "graphify.extractors", "graphify.exporters"]
+# pragma: rmtree(graphify.connectors, graphify.connectors.android) — keep both
+# connector subpackages on a fresh install or `graphify android-diagnose` breaks.
+packages = ["graphify", "graphify.extractors", "graphify.exporters", "graphify.connectors", "graphify.connectors.android"]
 include-package-data = false
 
 [tool.setuptools.package-data]

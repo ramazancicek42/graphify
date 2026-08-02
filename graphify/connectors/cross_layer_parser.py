@@ -417,14 +417,16 @@ class CrossLayerParser:
                     if isinstance(node, ast.ClassDef):
                         # Base sınıfından türeyen modeller
                         for base in node.bases:
-                            if isinstance(base, ast.Attribute):
-                                if base.attr == 'Model':  # Django ORM
-                                    self._process_django_model(node, rel_path)
-                                elif base.attr == 'Base':  # SQLAlchemy
+                            if isinstance(base, ast.Name):
+                                if base.id == 'Base':  # SQLAlchemy DeclarativeBase
                                     self._process_sqlalchemy_model(node, rel_path, content)
-                            elif isinstance(base, ast.Name):
-                                if base.id == 'Document':  # MongoDB ODM
+                                elif base.id == 'Document':  # MongoDB ODM
                                     pass  # İleride eklenebilir
+                            elif isinstance(base, ast.Attribute):
+                                if base.attr == 'Model':  # Django ORM (models.Model)
+                                    self._process_django_model(node, rel_path)
+                                elif base.attr == 'Base':  # SQLAlchemy (module.Base)
+                                    self._process_sqlalchemy_model(node, rel_path, content)
         except SyntaxError:
             pass  # Parse edilemeyen dosyaları atla
     
@@ -451,11 +453,18 @@ class CrossLayerParser:
         # Tablo adını bul
         table_name = None
         for item in node.body:
-            if isinstance(item, ast.AnnAssign) or isinstance(item, ast.Assign):
-                if isinstance(item.target, ast.Name) and item.target.id == '__tablename__':
-                    if isinstance(item.value, ast.Constant):
-                        table_name = item.value.value
-                    break
+            if isinstance(item, ast.AnnAssign):
+                target = item.target
+                value = item.value
+            elif isinstance(item, ast.Assign) and item.targets:
+                target = item.targets[0]
+                value = item.value
+            else:
+                continue
+            if isinstance(target, ast.Name) and target.id == '__tablename__':
+                if isinstance(value, ast.Constant):
+                    table_name = value.value
+                break
         
         if not table_name:
             table_name = node.name.lower()

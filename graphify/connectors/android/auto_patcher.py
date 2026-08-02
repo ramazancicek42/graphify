@@ -164,29 +164,34 @@ class AutoPatcher:
             
         content = build_gradle.read_text(encoding='utf-8')
         required_api = context.get('required_api_level')
-        
+
         if not required_api:
             return None
-            
-        # compileSdkVersion güncelle
-        pattern = r'(compileSdkVersion\s+)(\d+)'
-        match = re.search(pattern, content)
-        
-        if match and int(match.group(2)) < required_api:
-            fixed_code = re.sub(
-                pattern,
-                f'\\g<1>{required_api}',
-                content
-            )
-            
+
+        # Groovy DSL: compileSdkVersion 34  |  Kotlin DSL: compileSdk = 34
+        patterns = [
+            (r'(compileSdkVersion\s+)(\d+)', r'\\g<1>{required_api}'),
+            (r'(compileSdk\s*=\s*)(\d+)', r'\\g<1>{required_api}'),
+        ]
+        found_old = None
+        for pat, _ in patterns:
+            m = re.search(pat, content)
+            if m:
+                found_old = (pat, int(m.group(2)))
+                break
+
+        if found_old and found_old[1] < required_api:
+            pat = found_old[0]
+            fixed_code = re.sub(pat, f'\\g<1>{required_api}', content)
+
             return PatchProposal(
                 file_path=str(build_gradle.relative_to(self.project_root)),
                 original_code=content,
                 fixed_code=fixed_code,
-                reason=f"compileSdkVersion must be at least {required_api}",
+                reason=f"compileSdk must be at least {required_api}",
                 confidence=0.90
             )
-        
+
         return None
     
     def apply_patch(self, patch: PatchProposal, dry_run: bool = False) -> bool:
