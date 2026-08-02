@@ -3875,7 +3875,29 @@ def dispatch_command(cmd: str) -> None:
         _wja(out_path2, merged2, ensure_ascii=False)
         print(f"Merged: {len(merged2['nodes'])} nodes, {len(merged2['edges'])} edges")
 
-    elif Path(cmd).exists() or cmd in (".", "..") or cmd.startswith(("./", "../", "/", "~")):
+    elif cmd == "android-diagnose":
+        # graphify android-diagnose <error_log> --graph <graph_path> -o <output>
+        # Android proje hatalarını analiz eder ve AI için düzeltme talimatları üretir.
+        from graphify.connectors.android import diagnose_error_log
+        if len(sys.argv) < 3:
+            print("Usage: graphify android-diagnose <error_log> [--graph <path>] [-o <output>]", file=sys.stderr)
+            print("  Analyzes Android build errors and generates AI-friendly fix instructions.", file=sys.stderr)
+            sys.exit(1)
+        log_file = sys.argv[2]
+        graph_file = "graph.graphml"
+        output_file = None
+        i = 3
+        while i < len(sys.argv):
+            if sys.argv[i] in ("--graph", "-g") and i + 1 < len(sys.argv):
+                graph_file = sys.argv[i + 1]; i += 2
+            elif sys.argv[i] in ("--output", "-o") and i + 1 < len(sys.argv):
+                output_file = sys.argv[i + 1]; i += 2
+            else:
+                i += 1
+        exit_code = diagnose_error_log(log_file, graph_file, output_file)
+        sys.exit(exit_code)
+
+    elif cmd == "diagnose":
         # User ran `graphify <path>` directly — treat as `graphify extract <path>`.
         # Common when following the PowerShell note in README (`graphify .`) or
         # copy-pasting skill invocations without the leading slash.
