@@ -69,6 +69,13 @@ from .microservice_tracer import (
     MicroserviceTracer,
 )
 
+# Android-specific connectors
+from .ui_mapper import UIMapper
+from .data_flow_tracker import DataFlowTracker
+from .di_resolver import DIGraphResolver
+from .manifest_analyzer import ManifestAnalyzer
+from .termux_optimizer import TermuxOptimizer, enable_termux_mode
+
 __all__ = [
     # Cross-Layer Parser
     'CrossLayerParser',
@@ -114,6 +121,14 @@ __all__ = [
     # Microservices
     'parse_microservices',
     'MicroserviceTracer',
+    
+    # Android-Specific Connectors
+    'UIMapper',
+    'DataFlowTracker',
+    'DIGraphResolver',
+    'ManifestAnalyzer',
+    'TermuxOptimizer',
+    'enable_termux_mode',
 ]
 
 
