@@ -1,0 +1,986 @@
+{
+  "nodes": [
+    {
+      "id": "func_94634f33",
+      "type": "frontend_function",
+      "layer": "frontend",
+      "label": "getUserProfile",
+      "file_path": "frontend/userService.ts",
+      "line_number": 18,
+      "metadata": {
+        "calls": [
+          ":param/users/:param"
+        ]
+      }
+    },
+    {
+      "id": "api_call_7b71be49",
+      "type": "api_call",
+      "layer": "frontend",
+      "label": "GET :param/users/:param",
+      "file_path": "frontend/userService.ts",
+      "line_number": 18,
+      "metadata": {
+        "method": "GET",
+        "endpoint": ":param/users/:param",
+        "function": "getUserProfile"
+      }
+    },
+    {
+      "id": "func_1501689e",
+      "type": "frontend_function",
+      "layer": "frontend",
+      "label": "updateUserProfile",
+      "file_path": "frontend/userService.ts",
+      "line_number": 29,
+      "metadata": {
+        "calls": [
+          ":param/users/:param"
+        ]
+      }
+    },
+    {
+      "id": "api_call_9092d2cf",
+      "type": "api_call",
+      "layer": "frontend",
+      "label": "PUT :param/users/:param",
+      "file_path": "frontend/userService.ts",
+      "line_number": 29,
+      "metadata": {
+        "method": "PUT",
+        "endpoint": ":param/users/:param",
+        "function": "updateUserProfile"
+      }
+    },
+    {
+      "id": "func_02415371",
+      "type": "frontend_function",
+      "layer": "frontend",
+      "label": "deleteUser",
+      "file_path": "frontend/userService.ts",
+      "line_number": 55,
+      "metadata": {
+        "calls": [
+          ":param/users/:param"
+        ]
+      }
+    },
+    {
+      "id": "api_call_3c7b0a17",
+      "type": "api_call",
+      "layer": "frontend",
+      "label": "DELETE :param/users/:param",
+      "file_path": "frontend/userService.ts",
+      "line_number": 55,
+      "metadata": {
+        "method": "DELETE",
+        "endpoint": ":param/users/:param",
+        "function": "deleteUser"
+      }
+    },
+    {
+      "id": "func_6e9a91f1",
+      "type": "frontend_function",
+      "layer": "frontend",
+      "label": "listUsers",
+      "file_path": "frontend/userService.ts",
+      "line_number": 62,
+      "metadata": {
+        "calls": [
+          ":param/users"
+        ]
+      }
+    },
+    {
+      "id": "api_call_3b9fe74f",
+      "type": "api_call",
+      "layer": "frontend",
+      "label": "GET :param/users",
+      "file_path": "frontend/userService.ts",
+      "line_number": 62,
+      "metadata": {
+        "method": "GET",
+        "endpoint": ":param/users",
+        "function": "listUsers"
+      }
+    },
+    {
+      "id": "handler_c6ec65a2",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "list_users",
+      "file_path": "backend/user_api.py",
+      "line_number": 45,
+      "metadata": {
+        "framework": "fastapi",
+        "endpoints": [
+          "/api/v1/users"
+        ]
+      }
+    },
+    {
+      "id": "endpoint_42f6e7ff",
+      "type": "api_endpoint",
+      "layer": "backend",
+      "label": "GET /api/v1/users",
+      "file_path": "backend/user_api.py",
+      "line_number": 45,
+      "metadata": {
+        "method": "GET",
+        "path": "/api/v1/users",
+        "framework": "gin",
+        "handler": "list_users"
+      }
+    },
+    {
+      "id": "handler_660c464e",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "list_users",
+      "file_path": "backend/user_api.py",
+      "line_number": 45,
+      "metadata": {
+        "framework": "express",
+        "endpoints": [
+          "/api/v1/users"
+        ]
+      }
+    },
+    {
+      "id": "handler_918faec3",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "list_users",
+      "file_path": "backend/user_api.py",
+      "line_number": 45,
+      "metadata": {
+        "framework": "gin",
+        "endpoints": [
+          "/api/v1/users"
+        ]
+      }
+    },
+    {
+      "id": "handler_1adc231a",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "get_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 65,
+      "metadata": {
+        "framework": "fastapi",
+        "endpoints": [
+          "/api/v1/users/{user_id}"
+        ]
+      }
+    },
+    {
+      "id": "endpoint_a7773ad3",
+      "type": "api_endpoint",
+      "layer": "backend",
+      "label": "GET /api/v1/users/{user_id}",
+      "file_path": "backend/user_api.py",
+      "line_number": 65,
+      "metadata": {
+        "method": "GET",
+        "path": "/api/v1/users/{user_id}",
+        "framework": "gin",
+        "handler": "get_user"
+      }
+    },
+    {
+      "id": "handler_2fc87601",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "get_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 65,
+      "metadata": {
+        "framework": "express",
+        "endpoints": [
+          "/api/v1/users/{user_id}"
+        ]
+      }
+    },
+    {
+      "id": "handler_33bc9e9d",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "get_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 65,
+      "metadata": {
+        "framework": "gin",
+        "endpoints": [
+          "/api/v1/users/{user_id}"
+        ]
+      }
+    },
+    {
+      "id": "handler_7d534bb4",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "update_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 88,
+      "metadata": {
+        "framework": "fastapi",
+        "endpoints": [
+          "/api/v1/users/{user_id}"
+        ]
+      }
+    },
+    {
+      "id": "endpoint_10a47523",
+      "type": "api_endpoint",
+      "layer": "backend",
+      "label": "PUT /api/v1/users/{user_id}",
+      "file_path": "backend/user_api.py",
+      "line_number": 88,
+      "metadata": {
+        "method": "PUT",
+        "path": "/api/v1/users/{user_id}",
+        "framework": "gin",
+        "handler": "update_user"
+      }
+    },
+    {
+      "id": "handler_d0f15520",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "update_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 88,
+      "metadata": {
+        "framework": "express",
+        "endpoints": [
+          "/api/v1/users/{user_id}"
+        ]
+      }
+    },
+    {
+      "id": "handler_a2d2e300",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "update_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 88,
+      "metadata": {
+        "framework": "gin",
+        "endpoints": [
+          "/api/v1/users/{user_id}"
+        ]
+      }
+    },
+    {
+      "id": "handler_39856dc9",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "upload_avatar",
+      "file_path": "backend/user_api.py",
+      "line_number": 144,
+      "metadata": {
+        "framework": "fastapi",
+        "endpoints": [
+          "/api/v1/users/{user_id}/avatar"
+        ]
+      }
+    },
+    {
+      "id": "endpoint_d6b451cc",
+      "type": "api_endpoint",
+      "layer": "backend",
+      "label": "POST /api/v1/users/{user_id}/avatar",
+      "file_path": "backend/user_api.py",
+      "line_number": 144,
+      "metadata": {
+        "method": "POST",
+        "path": "/api/v1/users/{user_id}/avatar",
+        "framework": "gin",
+        "handler": "upload_avatar"
+      }
+    },
+    {
+      "id": "handler_85c913d9",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "upload_avatar",
+      "file_path": "backend/user_api.py",
+      "line_number": 144,
+      "metadata": {
+        "framework": "express",
+        "endpoints": [
+          "/api/v1/users/{user_id}/avatar"
+        ]
+      }
+    },
+    {
+      "id": "handler_35a3b78c",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "upload_avatar",
+      "file_path": "backend/user_api.py",
+      "line_number": 144,
+      "metadata": {
+        "framework": "gin",
+        "endpoints": [
+          "/api/v1/users/{user_id}/avatar"
+        ]
+      }
+    },
+    {
+      "id": "handler_c629ae67",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "delete_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 168,
+      "metadata": {
+        "framework": "fastapi",
+        "endpoints": [
+          "/api/v1/users/{user_id}"
+        ]
+      }
+    },
+    {
+      "id": "endpoint_4d9a8d9f",
+      "type": "api_endpoint",
+      "layer": "backend",
+      "label": "DELETE /api/v1/users/{user_id}",
+      "file_path": "backend/user_api.py",
+      "line_number": 168,
+      "metadata": {
+        "method": "DELETE",
+        "path": "/api/v1/users/{user_id}",
+        "framework": "gin",
+        "handler": "delete_user"
+      }
+    },
+    {
+      "id": "handler_87f4f376",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "delete_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 168,
+      "metadata": {
+        "framework": "express",
+        "endpoints": [
+          "/api/v1/users/{user_id}"
+        ]
+      }
+    },
+    {
+      "id": "handler_56c4ca0a",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "delete_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 168,
+      "metadata": {
+        "framework": "gin",
+        "endpoints": [
+          "/api/v1/users/{user_id}"
+        ]
+      }
+    },
+    {
+      "id": "handler_0fc634bd",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "create_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 185,
+      "metadata": {
+        "framework": "fastapi",
+        "endpoints": [
+          "/api/v1/users"
+        ]
+      }
+    },
+    {
+      "id": "endpoint_2f5d1a30",
+      "type": "api_endpoint",
+      "layer": "backend",
+      "label": "POST /api/v1/users",
+      "file_path": "backend/user_api.py",
+      "line_number": 185,
+      "metadata": {
+        "method": "POST",
+        "path": "/api/v1/users",
+        "framework": "gin",
+        "handler": "create_user"
+      }
+    },
+    {
+      "id": "handler_3da64efb",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "create_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 185,
+      "metadata": {
+        "framework": "express",
+        "endpoints": [
+          "/api/v1/users"
+        ]
+      }
+    },
+    {
+      "id": "handler_a31e1216",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "create_user",
+      "file_path": "backend/user_api.py",
+      "line_number": 185,
+      "metadata": {
+        "framework": "gin",
+        "endpoints": [
+          "/api/v1/users"
+        ]
+      }
+    },
+    {
+      "id": "handler_b06855bc",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "get_user_orders",
+      "file_path": "backend/user_api.py",
+      "line_number": 218,
+      "metadata": {
+        "framework": "fastapi",
+        "endpoints": [
+          "/api/v1/users/{user_id}/orders"
+        ]
+      }
+    },
+    {
+      "id": "endpoint_94b6d91f",
+      "type": "api_endpoint",
+      "layer": "backend",
+      "label": "GET /api/v1/users/{user_id}/orders",
+      "file_path": "backend/user_api.py",
+      "line_number": 218,
+      "metadata": {
+        "method": "GET",
+        "path": "/api/v1/users/{user_id}/orders",
+        "framework": "gin",
+        "handler": "get_user_orders"
+      }
+    },
+    {
+      "id": "handler_f95a62fb",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "get_user_orders",
+      "file_path": "backend/user_api.py",
+      "line_number": 218,
+      "metadata": {
+        "framework": "express",
+        "endpoints": [
+          "/api/v1/users/{user_id}/orders"
+        ]
+      }
+    },
+    {
+      "id": "handler_a3ac3107",
+      "type": "backend_handler",
+      "layer": "backend",
+      "label": "get_user_orders",
+      "file_path": "backend/user_api.py",
+      "line_number": 218,
+      "metadata": {
+        "framework": "gin",
+        "endpoints": [
+          "/api/v1/users/{user_id}/orders"
+        ]
+      }
+    },
+    {
+      "id": "sql_ref_8c20bf25",
+      "type": "sql_reference",
+      "layer": "database",
+      "label": "SELECT users",
+      "file_path": "backend/user_api.py",
+      "line_number": 51,
+      "metadata": {
+        "table": "users",
+        "operation": "SELECT",
+        "function": "list_users"
+      }
+    },
+    {
+      "id": "sql_ref_c272049d",
+      "type": "sql_reference",
+      "layer": "database",
+      "label": "SELECT users",
+      "file_path": "backend/user_api.py",
+      "line_number": 72,
+      "metadata": {
+        "table": "users",
+        "operation": "SELECT",
+        "function": "get_user"
+      }
+    },
+    {
+      "id": "sql_ref_b78275b6",
+      "type": "sql_reference",
+      "layer": "database",
+      "label": "UPDATE users",
+      "file_path": "backend/user_api.py",
+      "line_number": 122,
+      "metadata": {
+        "table": "users",
+        "operation": "UPDATE",
+        "function": "update_user"
+      }
+    },
+    {
+      "id": "sql_ref_25b8a6fc",
+      "type": "sql_reference",
+      "layer": "database",
+      "label": "SELECT users",
+      "file_path": "backend/user_api.py",
+      "line_number": 128,
+      "metadata": {
+        "table": "users",
+        "operation": "SELECT",
+        "function": "update_user"
+      }
+    },
+    {
+      "id": "sql_ref_c96906af",
+      "type": "sql_reference",
+      "layer": "database",
+      "label": "UPDATE users",
+      "file_path": "backend/user_api.py",
+      "line_number": 160,
+      "metadata": {
+        "table": "users",
+        "operation": "UPDATE",
+        "function": "upload_avatar"
+      }
+    },
+    {
+      "id": "sql_ref_a789e800",
+      "type": "sql_reference",
+      "layer": "database",
+      "label": "DELETE users",
+      "file_path": "backend/user_api.py",
+      "line_number": 176,
+      "metadata": {
+        "table": "users",
+        "operation": "DELETE",
+        "function": "delete_user"
+      }
+    },
+    {
+      "id": "sql_ref_1628e388",
+      "type": "sql_reference",
+      "layer": "database",
+      "label": "INSERT users",
+      "file_path": "backend/user_api.py",
+      "line_number": 196,
+      "metadata": {
+        "table": "users",
+        "operation": "INSERT",
+        "function": "create_user"
+      }
+    },
+    {
+      "id": "sql_ref_efda0ace",
+      "type": "sql_reference",
+      "layer": "database",
+      "label": "JOIN ile",
+      "file_path": "backend/user_api.py",
+      "line_number": 223,
+      "metadata": {
+        "table": "ile",
+        "operation": "JOIN",
+        "function": "get_user_orders"
+      }
+    },
+    {
+      "id": "sql_ref_49d7183b",
+      "type": "sql_reference",
+      "layer": "database",
+      "label": "JOIN users",
+      "file_path": "backend/user_api.py",
+      "line_number": 229,
+      "metadata": {
+        "table": "users",
+        "operation": "JOIN",
+        "function": "get_user_orders"
+      }
+    },
+    {
+      "id": "table_73b39f91",
+      "type": "database_table",
+      "layer": "database",
+      "label": "users",
+      "file_path": "database/schema.sql",
+      "line_number": 0,
+      "metadata": {
+        "columns": {},
+        "primary_key": null,
+        "foreign_keys": {}
+      }
+    },
+    {
+      "id": "table_37cea7b0",
+      "type": "database_table",
+      "layer": "database",
+      "label": "orders",
+      "file_path": "database/schema.sql",
+      "line_number": 0,
+      "metadata": {
+        "columns": {},
+        "primary_key": null,
+        "foreign_keys": {
+          "user_id": "users"
+        }
+      }
+    },
+    {
+      "id": "table_a9035ce8",
+      "type": "database_table",
+      "layer": "database",
+      "label": "user_sessions",
+      "file_path": "database/schema.sql",
+      "line_number": 0,
+      "metadata": {
+        "columns": {},
+        "primary_key": null,
+        "foreign_keys": {
+          "user_id": "users"
+        }
+      }
+    },
+    {
+      "id": "table_a40ce2f3",
+      "type": "database_table",
+      "layer": "database",
+      "label": "audit_log",
+      "file_path": "database/schema.sql",
+      "line_number": 0,
+      "metadata": {
+        "columns": {},
+        "primary_key": null,
+        "foreign_keys": {
+          "user_id": "users"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "func_94634f33",
+      "target": "api_call_7b71be49",
+      "type": "calls_api"
+    },
+    {
+      "source": "func_1501689e",
+      "target": "api_call_9092d2cf",
+      "type": "calls_api"
+    },
+    {
+      "source": "func_02415371",
+      "target": "api_call_3c7b0a17",
+      "type": "calls_api"
+    },
+    {
+      "source": "func_6e9a91f1",
+      "target": "api_call_3b9fe74f",
+      "type": "calls_api"
+    },
+    {
+      "source": "handler_c6ec65a2",
+      "target": "endpoint_42f6e7ff",
+      "type": "handles_request"
+    },
+    {
+      "source": "endpoint_42f6e7ff",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_42f6e7ff",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_42f6e7ff",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_42f6e7ff",
+      "target": "sql_ref_8c20bf25",
+      "type": "inserts_into_table"
+    },
+    {
+      "source": "endpoint_42f6e7ff",
+      "target": "sql_ref_8c20bf25",
+      "type": "inserts_into_table"
+    },
+    {
+      "source": "endpoint_42f6e7ff",
+      "target": "sql_ref_8c20bf25",
+      "type": "inserts_into_table"
+    },
+    {
+      "source": "handler_660c464e",
+      "target": "endpoint_42f6e7ff",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_918faec3",
+      "target": "endpoint_42f6e7ff",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_1adc231a",
+      "target": "endpoint_a7773ad3",
+      "type": "handles_request"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "updates_table"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "updates_table"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "updates_table"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "deletes_from_table"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "deletes_from_table"
+    },
+    {
+      "source": "endpoint_a7773ad3",
+      "target": "sql_ref_8c20bf25",
+      "type": "deletes_from_table"
+    },
+    {
+      "source": "handler_2fc87601",
+      "target": "endpoint_a7773ad3",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_33bc9e9d",
+      "target": "endpoint_a7773ad3",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_7d534bb4",
+      "target": "endpoint_10a47523",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_d0f15520",
+      "target": "endpoint_10a47523",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_a2d2e300",
+      "target": "endpoint_10a47523",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_39856dc9",
+      "target": "endpoint_d6b451cc",
+      "type": "handles_request"
+    },
+    {
+      "source": "endpoint_d6b451cc",
+      "target": "sql_ref_8c20bf25",
+      "type": "updates_table"
+    },
+    {
+      "source": "endpoint_d6b451cc",
+      "target": "sql_ref_8c20bf25",
+      "type": "updates_table"
+    },
+    {
+      "source": "endpoint_d6b451cc",
+      "target": "sql_ref_8c20bf25",
+      "type": "updates_table"
+    },
+    {
+      "source": "handler_85c913d9",
+      "target": "endpoint_d6b451cc",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_35a3b78c",
+      "target": "endpoint_d6b451cc",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_c629ae67",
+      "target": "endpoint_4d9a8d9f",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_87f4f376",
+      "target": "endpoint_4d9a8d9f",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_56c4ca0a",
+      "target": "endpoint_4d9a8d9f",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_0fc634bd",
+      "target": "endpoint_2f5d1a30",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_3da64efb",
+      "target": "endpoint_2f5d1a30",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_a31e1216",
+      "target": "endpoint_2f5d1a30",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_b06855bc",
+      "target": "endpoint_94b6d91f",
+      "type": "handles_request"
+    },
+    {
+      "source": "endpoint_94b6d91f",
+      "target": "sql_ref_efda0ace",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_94b6d91f",
+      "target": "sql_ref_efda0ace",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_94b6d91f",
+      "target": "sql_ref_efda0ace",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_94b6d91f",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_94b6d91f",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "endpoint_94b6d91f",
+      "target": "sql_ref_8c20bf25",
+      "type": "queries_table"
+    },
+    {
+      "source": "handler_f95a62fb",
+      "target": "endpoint_94b6d91f",
+      "type": "handles_request"
+    },
+    {
+      "source": "handler_a3ac3107",
+      "target": "endpoint_94b6d91f",
+      "type": "handles_request"
+    },
+    {
+      "source": "sql_ref_8c20bf25",
+      "target": "table_73b39f91",
+      "type": "queries_table"
+    },
+    {
+      "source": "sql_ref_8c20bf25",
+      "target": "table_73b39f91",
+      "type": "queries_table"
+    },
+    {
+      "source": "sql_ref_8c20bf25",
+      "target": "table_73b39f91",
+      "type": "updates_table"
+    },
+    {
+      "source": "sql_ref_8c20bf25",
+      "target": "table_73b39f91",
+      "type": "queries_table"
+    },
+    {
+      "source": "sql_ref_8c20bf25",
+      "target": "table_73b39f91",
+      "type": "updates_table"
+    },
+    {
+      "source": "sql_ref_8c20bf25",
+      "target": "table_73b39f91",
+      "type": "deletes_from_table"
+    },
+    {
+      "source": "sql_ref_8c20bf25",
+      "target": "table_73b39f91",
+      "type": "inserts_into_table"
+    },
+    {
+      "source": "sql_ref_8c20bf25",
+      "target": "table_73b39f91",
+      "type": "queries_table"
+    }
+  ],
+  "summary": {
+    "total_nodes": 49,
+    "total_edges": 60,
+    "layers": [
+      "frontend",
+      "database",
+      "backend"
+    ]
+  }
+}
