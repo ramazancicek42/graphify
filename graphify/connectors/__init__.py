@@ -184,7 +184,9 @@ def parse_fullstack_project(
         try:
             parser = CrossLayerParser()
             parser.scan_directory(directory)
-            graphs['cross_layer'] = parser.build_graph()
+            builder = UnifiedGraphBuilder()
+            builder.from_parser(parser)
+            graphs['cross_layer'] = builder.graph
         except Exception as e:
             graphs['cross_layer_error'] = str(e)
             
