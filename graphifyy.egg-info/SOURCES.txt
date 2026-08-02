@@ -79,6 +79,7 @@ graphify/exporters/base.py
 graphify/exporters/graphdb.py
 graphify/exporters/html.py
 graphify/extractors/__init__.py
+graphify/extractors/android_xml.py
 graphify/extractors/apex.py
 graphify/extractors/base.py
 graphify/extractors/bash.py
@@ -228,6 +229,7 @@ tests/test_affected_cli.py
 tests/test_affected_member_seed.py
 tests/test_agents_platform.py
 tests/test_analyze.py
+tests/test_android_xml.py
 tests/test_anthropic_custom_endpoint.py
 tests/test_antigravity_install.py
 tests/test_astro_extraction.py
